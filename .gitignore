@@ -1,0 +1,21 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+node_modules/
+dist/
+.vscode/
+.idea/
+.DS_Store
+
+# External controlled-access research data must never be committed.
+PROCESS-2/
+data/raw/
+
+# Keep generated research outputs out of version control, except placeholders.
+artifacts/models/*
+!artifacts/models/.gitkeep
+artifacts/features/*
+!artifacts/features/.gitkeep
+artifacts/transcripts/*
+!artifacts/transcripts/.gitkeep
