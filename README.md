@@ -12,8 +12,33 @@ This repository is the initial skeleton for a research prototype exploring speec
 
 PROCESS-2 is an external controlled-access research dataset. It remains outside this Git repository and must never be committed, copied, uploaded, or placed in the application source tree. Configure its local location through `PROCESS2_DATASET_PATH` in a local `.env` file based on `.env.example`.
 
-The backend configuration can verify that the configured path exists, but this initial skeleton does not inspect or process any dataset content.
+The application reads the local dataset location from `PROCESS2_DATASET_PATH`. Dataset files remain read-only and external to this repository. Metadata validation and descriptive EDA read the CSV without changing it; raw audio and transcripts are neither copied nor processed.
+
+## Local environment
+
+Use the single virtual environment at the project root. Do not create or use a separate `backend\.venv`.
+
+```powershell
+cd D:\minorProject\Project\speech-cognitive-screening
+.\.venv\Scripts\Activate.ps1
+pip install -r backend\requirements.txt
+```
+
+## Metadata EDA
+
+Run the read-only metadata EDA with:
+
+```powershell
+cd D:\minorProject\Project\speech-cognitive-screening
+.\.venv\Scripts\python.exe .\scripts\run_eda.py
+```
+
+Figures and a compact summary CSV are written to `artifacts/results/eda/`. The EDA creates `screening_label` only in memory: `HC` is `Healthy`, while `MCI` and `Dementia` are `Impaired`.
+
+## Data-split rule
+
+The official TEST split must remain untouched during model development. Metadata-level descriptive plots may summarize the complete dataset for documentation, but predictive feature analysis, feature selection, model fitting, and hyperparameter tuning must operate only on TRAIN participants.
 
 ## Current status
 
-The repository currently contains only the initial project structure, a health-check FastAPI service, and a minimal React landing page. Cognitive screening, dataset analysis, audio/NLP processing, and machine-learning models have not been implemented.
+The repository contains a health-check FastAPI service, a minimal React landing page, read-only PROCESS-2 validation, and metadata EDA. Cognitive screening, audio/NLP processing, feature extraction, and machine-learning models have not been implemented.
