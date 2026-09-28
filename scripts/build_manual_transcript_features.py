@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import Counter
 import math
 from pathlib import Path
 import sys
@@ -26,11 +27,14 @@ from ml.data.process2_loader import (
     load_metadata,
     participant_directories,
 )
-from ml.nlp.linguistic_features import extract_linguistic_features, p_initial_features
+from ml.nlp.linguistic_features import (
+    extract_linguistic_features,
+    p_initial_features,
+    unavailable_linguistic_features,
+)
 from ml.nlp.transcript_parser import (
     TASK_NAMES,
     parse_transcript_file,
-    parse_transcript_text,
     transcript_paths_by_task,
 )
 
@@ -45,17 +49,27 @@ def prefixed_features(task_name: str, features: dict[str, float | int]) -> dict[
     return {f"{task_name.casefold()}_{name}": value for name, value in features.items()}
 
 
-def features_for_task(transcript_path: Path | None, task_name: str) -> dict[str, float | int]:
-    """Return deterministic features for one task, using empty values when absent."""
+def features_for_task(
+    transcript_path: Path | None, task_name: str
+) -> tuple[dict[str, float | int], str]:
+    """Return task features and a non-predictive transcript-quality status."""
 
-    parsed = parse_transcript_file(transcript_path) if transcript_path else parse_transcript_text("")
-    features = extract_linguistic_features(parsed)
+    if transcript_path is None:
+        features: dict[str, float | int] = unavailable_linguistic_features()
+        status = "missing_transcript"
+    else:
+        parsed = parse_transcript_file(transcript_path)
+        features = extract_linguistic_features(parsed)
+        status = parsed.speaker_attribution
     if task_name == "PFT":
-        features.update(p_initial_features(parsed))
-    return prefixed_features(task_name, features)
+        if transcript_path is None or status == "no_participant_label":
+            features.update({"p_initial_word_count": float("nan"), "p_initial_ratio": float("nan")})
+        else:
+            features.update(p_initial_features(parsed))
+    return prefixed_features(task_name, features), status
 
 
-def build_feature_table() -> tuple[pd.DataFrame, list[str]]:
+def build_feature_table() -> tuple[pd.DataFrame, list[str], Counter[str]]:
     """Build one reference-and-feature row per metadata participant.
 
     Deterministic feature extraction is applied to all participants. No statistic is
@@ -73,6 +87,7 @@ def build_feature_table() -> tuple[pd.DataFrame, list[str]]:
     screening_labels = create_screening_label(metadata[columns.diagnosis])
     rows: list[dict[str, object]] = []
     warnings: list[str] = []
+    quality_status_counts: Counter[str] = Counter()
     for row_index, metadata_row in metadata.iterrows():
         matching_directories = {
             directory
@@ -96,13 +111,19 @@ def build_feature_table() -> tuple[pd.DataFrame, list[str]]:
             if len(paths) != 1:
                 warnings.append(f"A participant did not have exactly one {task_name} transcript.")
             try:
-                row.update(features_for_task(paths[0] if len(paths) == 1 else None, task_name))
+                task_features, quality_status = features_for_task(
+                    paths[0] if len(paths) == 1 else None, task_name
+                )
+                row.update(task_features)
+                quality_status_counts[f"{task_name}_{quality_status}"] += 1
             except (OSError, UnicodeError):
                 warnings.append(f"A {task_name} transcript could not be read with UTF-8.")
-                row.update(features_for_task(None, task_name))
+                task_features, quality_status = features_for_task(None, task_name)
+                row.update(task_features)
+                quality_status_counts[f"{task_name}_{quality_status}"] += 1
         rows.append(row)
 
-    return pd.DataFrame(rows), warnings
+    return pd.DataFrame(rows), warnings, quality_status_counts
 
 
 def feature_columns(feature_table: pd.DataFrame) -> list[str]:
@@ -111,7 +132,9 @@ def feature_columns(feature_table: pd.DataFrame) -> list[str]:
     return [column for column in feature_table.columns if column not in BOOKKEEPING_COLUMNS]
 
 
-def print_feature_quality_report(feature_table: pd.DataFrame) -> None:
+def print_feature_quality_report(
+    feature_table: pd.DataFrame, quality_status_counts: Counter[str]
+) -> None:
     """Print feature integrity and TRAIN-only descriptive statistics."""
 
     features = feature_columns(feature_table)
@@ -140,6 +163,9 @@ def print_feature_quality_report(feature_table: pd.DataFrame) -> None:
     print(f"TEST participant count: {int(test_mask.sum())}")
     print(f"Healthy count: {int(labels.eq('Healthy').sum())}")
     print(f"Impaired count: {int(labels.eq('Impaired').sum())}")
+    print("\nNon-predictive transcript-quality status counts")
+    for status, count in sorted(quality_status_counts.items()):
+        print(f"{status}: {count}")
     print("\nMissing-value count by feature")
     print(missing_counts.to_string())
     print("\nConstant TRAIN features")
@@ -152,14 +178,14 @@ def print_feature_quality_report(feature_table: pd.DataFrame) -> None:
 
 def main() -> int:
     try:
-        feature_table, warnings = build_feature_table()
+        feature_table, warnings, quality_status_counts = build_feature_table()
     except (DatasetConfigurationError, DatasetValidationError, RuntimeError, ValueError) as error:
         print(f"Feature build could not continue: {error}")
         return 1
 
     FEATURE_OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     feature_table.to_csv(FEATURE_OUTPUT_PATH, index=False)
-    print_feature_quality_report(feature_table)
+    print_feature_quality_report(feature_table, quality_status_counts)
     print(f"\nSaved feature table: {FEATURE_OUTPUT_PATH}")
     if warnings:
         print("\nTranscript build warnings")

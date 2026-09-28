@@ -55,6 +55,24 @@ def test_empty_transcript_returns_safe_counts_and_nan_ratios() -> None:
     assert math.isnan(features["honore_statistic"])
 
 
+def test_unattributable_speaker_text_becomes_missing_features() -> None:
+    parsed = parse_transcript_text("Oth: words that cannot be attributed")
+    features = extract_linguistic_features(parsed)
+
+    assert parsed.speaker_attribution == "no_participant_label"
+    assert math.isnan(features["word_count"])
+    assert math.isnan(features["pause_annotation_count"])
+
+
+def test_successfully_parsed_transcript_without_pauses_uses_zero_pause_summary() -> None:
+    features = extract_linguistic_features(parse_transcript_text("Pat: verified response"))
+
+    assert features["pause_annotation_count"] == 0
+    assert features["pause_annotation_total_seconds"] == 0
+    assert features["pause_annotation_mean_seconds"] == 0
+    assert features["pause_annotation_max_seconds"] == 0
+
+
 def test_unlabeled_transcript_uses_documented_fallback() -> None:
     parsed = parse_transcript_text("apple pear (1.5 seconds)")
 

@@ -12,6 +12,22 @@ from ml.nlp.transcript_parser import ParsedTranscript
 
 DEFAULT_FILLERS = frozenset({"um", "uh", "erm", "er", "hmm"})
 TOKEN_PATTERN = re.compile(r"[A-Za-z]+(?:'[A-Za-z]+)?")
+LINGUISTIC_FEATURE_NAMES = (
+    "word_count",
+    "unique_word_count",
+    "type_token_ratio",
+    "average_word_length",
+    "repeated_word_count",
+    "repetition_ratio",
+    "filler_count",
+    "filler_ratio",
+    "pause_annotation_count",
+    "pause_annotation_total_seconds",
+    "pause_annotation_mean_seconds",
+    "pause_annotation_max_seconds",
+    "brunet_index",
+    "honore_statistic",
+)
 
 
 def tokenize_text(text: str) -> list[str]:
@@ -45,11 +61,20 @@ def honore_statistic(tokens: Iterable[str]) -> float:
     return float(100 * math.log(token_count) / denominator)
 
 
+def unavailable_linguistic_features() -> dict[str, float]:
+    """Return NaN features for a missing or unattributable participant transcript."""
+
+    return {feature_name: float("nan") for feature_name in LINGUISTIC_FEATURE_NAMES}
+
+
 def extract_linguistic_features(
     parsed_transcript: ParsedTranscript,
     filler_tokens: Iterable[str] = DEFAULT_FILLERS,
 ) -> dict[str, float | int]:
     """Extract deterministic participant-only features from a parsed transcript."""
+
+    if parsed_transcript.speaker_attribution == "no_participant_label":
+        return unavailable_linguistic_features()
 
     tokens = tokenize_text(parsed_transcript.participant_text)
     token_count = len(tokens)
@@ -72,8 +97,14 @@ def extract_linguistic_features(
         "filler_ratio": filler_count / token_count if token_count else float("nan"),
         "pause_annotation_count": parsed_transcript.pause_count,
         "pause_annotation_total_seconds": parsed_transcript.pause_total_seconds,
-        "pause_annotation_mean_seconds": parsed_transcript.pause_mean_seconds,
-        "pause_annotation_max_seconds": parsed_transcript.pause_max_seconds,
+        # Zero means a successfully parsed participant transcript had no detected
+        # pause annotation. Unavailable participant attribution remains NaN above.
+        "pause_annotation_mean_seconds": (
+            parsed_transcript.pause_mean_seconds if parsed_transcript.pause_count else 0.0
+        ),
+        "pause_annotation_max_seconds": (
+            parsed_transcript.pause_max_seconds if parsed_transcript.pause_count else 0.0
+        ),
         "brunet_index": brunet_index(tokens),
         "honore_statistic": honore_statistic(tokens),
     }

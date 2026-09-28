@@ -61,6 +61,19 @@ cd D:\minorProject\Project\speech-cognitive-screening
 
 The resulting table is written to `artifacts/features/manual_transcript_features.csv`. Its `diagnosis`, `screening_label`, participant ID, and split columns are labels/bookkeeping only; age, gender, and MMSE are not included. The official TEST split is never used for learned preprocessing, feature selection, or model development.
 
+When a participant transcript is unavailable or cannot be attributed to `Pat:`, its task-specific linguistic measurements are recorded as missing (`NaN`), not as genuine zero linguistic activity. In contrast, a successfully parsed participant transcript with no detected pause annotation has pause mean and maximum values of `0`. Honoré's statistic remains `NaN` whenever its formula is mathematically undefined.
+
+## Linguistic Logistic Regression baseline
+
+The initial baseline uses only task-prefixed linguistic features and the `screening_label` target (`Healthy=0`, `Impaired=1`). It uses the official TRAIN participants only with five-fold stratified cross-validation. Median imputation and standard scaling are inside the sklearn pipeline, so each validation fold is transformed only with its corresponding training-fold information. TEST participants are not evaluated.
+
+```powershell
+cd D:\minorProject\Project\speech-cognitive-screening
+.\.venv\Scripts\python.exe .\scripts\train_linguistic_baseline.py
+```
+
+Outputs are written to `artifacts/results/baseline/`; out-of-fold predictions contain only anonymized participant identifiers.
+
 ## Current status
 
 The repository contains a health-check FastAPI service, a minimal React landing page, read-only PROCESS-2 validation, and metadata EDA. Cognitive screening, audio/NLP processing, feature extraction, and machine-learning models have not been implemented.
