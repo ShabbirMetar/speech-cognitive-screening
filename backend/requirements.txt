@@ -7,3 +7,4 @@ httpx
 pandas
 matplotlib
 scikit-learn
+xgboost
