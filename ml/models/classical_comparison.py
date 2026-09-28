@@ -8,7 +8,8 @@ outer-fold training partition.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Literal
+from time import perf_counter
+from typing import Callable, Literal
 
 import numpy as np
 import pandas as pd
@@ -25,7 +26,7 @@ from sklearn.metrics import (
     recall_score,
     roc_auc_score,
 )
-from sklearn.model_selection import GridSearchCV, StratifiedKFold
+from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, StratifiedKFold
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import LinearSVC, SVC
@@ -49,7 +50,8 @@ MODEL_NAMES: tuple[ModelName, ...] = (
     "xgboost",
 )
 OUTER_CV_SPLITS = 5
-INNER_CV_SPLITS = 4
+INNER_CV_SPLITS = 3
+SEARCH_N_JOBS = 2
 
 
 @dataclass(frozen=True)
@@ -71,7 +73,7 @@ def build_outer_cv() -> StratifiedKFold:
 
 
 def build_inner_cv() -> StratifiedKFold:
-    """Return the fixed four-fold fold-local hyperparameter split."""
+    """Return the fixed three-fold fold-local hyperparameter split."""
 
     return StratifiedKFold(n_splits=INNER_CV_SPLITS, shuffle=True, random_state=42)
 
@@ -134,29 +136,54 @@ def parameter_grid(model: ModelName) -> dict[str, list[object]]:
 
     if model == "logistic":
         return {
-            "classifier__C": [0.01, 0.1, 1, 10],
+            "classifier__C": [0.1, 1.0, 10.0],
             "classifier__solver": ["liblinear"],
         }
     if model == "linear_svm":
-        return {"classifier__C": [0.01, 0.1, 1, 10]}
+        return {"classifier__C": [0.1, 1.0, 10.0]}
     if model == "rbf_svm":
-        return {"classifier__C": [0.1, 1, 10], "classifier__gamma": ["scale", 0.01, 0.1]}
+        return {"classifier__C": [0.5, 1.0, 5.0], "classifier__gamma": ["scale", 0.01]}
     if model == "random_forest":
         return {
-            "classifier__n_estimators": [200, 500],
+            "classifier__n_estimators": [200, 300, 500],
             "classifier__max_depth": [None, 4, 8],
             "classifier__min_samples_leaf": [1, 3, 5],
             "classifier__max_features": ["sqrt", 0.5],
         }
     if model == "xgboost":
         return {
-            "classifier__n_estimators": [100, 300],
+            "classifier__n_estimators": [100, 200, 300],
             "classifier__max_depth": [2, 3, 4],
-            "classifier__learning_rate": [0.03, 0.1],
+            "classifier__learning_rate": [0.03, 0.05, 0.1],
             "classifier__subsample": [0.8, 1.0],
             "classifier__colsample_bytree": [0.8, 1.0],
         }
     raise ValueError(f"Unknown model family: {model}")
+
+
+def build_inner_search(
+    model: ModelName, *, search_n_jobs: int = SEARCH_N_JOBS
+) -> GridSearchCV | RandomizedSearchCV:
+    """Build a compact fold-local F1 search without nested estimator parallelism."""
+
+    common_arguments = {
+        "estimator": clone(build_model_pipeline(model)),
+        "scoring": "f1",
+        "cv": build_inner_cv(),
+        "n_jobs": search_n_jobs,
+        "refit": True,
+        "return_train_score": False,
+        "error_score": "raise",
+        "verbose": 0,
+    }
+    if model in ("logistic", "linear_svm", "rbf_svm"):
+        return GridSearchCV(param_grid=parameter_grid(model), **common_arguments)
+    return RandomizedSearchCV(
+        param_distributions=parameter_grid(model),
+        n_iter=8,
+        random_state=42,
+        **common_arguments,
+    )
 
 
 def _specificity(y_true: np.ndarray, y_predicted: np.ndarray) -> float:
@@ -192,7 +219,11 @@ def _compact_parameters(parameters: dict[str, object]) -> dict[str, object]:
 
 
 def run_nested_cv_model(
-    feature_table: pd.DataFrame, model: ModelName, *, grid_n_jobs: int = 1
+    feature_table: pd.DataFrame,
+    model: ModelName,
+    *,
+    search_n_jobs: int = SEARCH_N_JOBS,
+    progress_callback: Callable[[str], None] | None = None,
 ) -> ModelResult:
     """Tune one model inside each outer TRAIN fold and save complete OOF data."""
 
@@ -208,16 +239,11 @@ def run_nested_cv_model(
 
     # The outer splitter receives TRAIN data only. TEST never reaches GridSearchCV or an estimator.
     for fold, (fit_index, validation_index) in enumerate(outer_cv.split(features, target), start=1):
-        search = GridSearchCV(
-            estimator=clone(build_model_pipeline(model)),
-            param_grid=parameter_grid(model),
-            scoring="f1",
-            cv=build_inner_cv(),
-            n_jobs=grid_n_jobs,
-            refit=True,
-            return_train_score=False,
-            error_score="raise",
-        )
+        if progress_callback:
+            progress_callback(f"  Outer fold {fold}/{OUTER_CV_SPLITS}...")
+            progress_callback("    Inner search started...")
+        started_at = perf_counter()
+        search = build_inner_search(model, search_n_jobs=search_n_jobs)
         fit_features, validation_features = features.iloc[fit_index], features.iloc[validation_index]
         search.fit(fit_features, target[fit_index])
         fitted = search.best_estimator_
@@ -226,6 +252,10 @@ def run_nested_cv_model(
         validation_score = model_score(fitted, validation_features)
         metrics = validation_metrics(target[validation_index], validation_prediction, validation_score)
         train_f1 = float(f1_score(target[fit_index], training_prediction, zero_division=0))
+        if progress_callback:
+            progress_callback(f"    Best inner F1: {search.best_score_:.3f}")
+            progress_callback(f"    Outer validation F1: {metrics['f1']:.3f}")
+            progress_callback(f"    Fold finished in {perf_counter() - started_at:.1f} seconds")
         fold_rows.append(
             {
                 "model": model,
@@ -278,11 +308,19 @@ def run_nested_cv_model(
 
 
 def run_classical_comparison(
-    feature_table: pd.DataFrame, *, grid_n_jobs: int = 1
+    feature_table: pd.DataFrame,
+    *,
+    search_n_jobs: int = SEARCH_N_JOBS,
+    progress_callback: Callable[[str], None] | None = None,
 ) -> dict[ModelName, ModelResult]:
     """Run each requested classical model using the same TRAIN-only outer folds."""
 
     return {
-        model: run_nested_cv_model(feature_table, model, grid_n_jobs=grid_n_jobs)
+        model: run_nested_cv_model(
+            feature_table,
+            model,
+            search_n_jobs=search_n_jobs,
+            progress_callback=progress_callback,
+        )
         for model in MODEL_NAMES
     }
