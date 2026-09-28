@@ -135,7 +135,6 @@ def parameter_grid(model: ModelName) -> dict[str, list[object]]:
     if model == "logistic":
         return {
             "classifier__C": [0.01, 0.1, 1, 10],
-            "classifier__penalty": ["l2"],
             "classifier__solver": ["liblinear"],
         }
     if model == "linear_svm":

@@ -14,6 +14,7 @@ from ml.models.classical_comparison import (
     build_inner_cv,
     build_model_pipeline,
     build_outer_cv,
+    parameter_grid,
     run_nested_cv_model,
 )
 
@@ -67,6 +68,18 @@ def test_pipelines_keep_preprocessing_inside_model_pipelines() -> None:
         pipeline = build_model_pipeline(model)
         assert isinstance(pipeline.named_steps["imputer"], SimpleImputer)
         assert "scaler" not in pipeline.named_steps
+
+
+def test_logistic_grid_preserves_c_and_solver_without_deprecated_penalty_setting() -> None:
+    pipeline = build_model_pipeline("logistic")
+    grid = parameter_grid("logistic")
+    assert pipeline.named_steps["classifier"].max_iter == 2000
+    assert pipeline.named_steps["classifier"].random_state == 42
+    assert grid == {
+        "classifier__C": [0.01, 0.1, 1, 10],
+        "classifier__solver": ["liblinear"],
+    }
+    assert "classifier__penalty" not in grid
 
 
 def test_outer_and_inner_split_counts() -> None:
