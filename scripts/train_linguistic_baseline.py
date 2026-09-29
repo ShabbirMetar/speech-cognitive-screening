@@ -14,10 +14,11 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from ml.models.baseline_logistic import run_all_experiments, training_rows
+from ml.data.development_guard import assert_train_only
+from ml.models.baseline_logistic import run_all_experiments
 
 
-FEATURE_TABLE_PATH = PROJECT_ROOT / "artifacts" / "features" / "manual_transcript_features.csv"
+FEATURE_TABLE_PATH = PROJECT_ROOT / "artifacts" / "features" / "linguistic_features_train.csv"
 OUTPUT_DIRECTORY = PROJECT_ROOT / "artifacts" / "results" / "baseline"
 
 
@@ -41,8 +42,8 @@ def main() -> int:
         print(f"Feature table not found: {FEATURE_TABLE_PATH}")
         return 1
 
-    feature_table = pd.read_csv(FEATURE_TABLE_PATH)
-    train_table = training_rows(feature_table)
+    feature_table = assert_train_only(pd.read_csv(FEATURE_TABLE_PATH))
+    train_table = feature_table
     results = run_all_experiments(feature_table)
     OUTPUT_DIRECTORY.mkdir(parents=True, exist_ok=True)
 

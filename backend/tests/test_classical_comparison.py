@@ -126,7 +126,7 @@ def test_optimized_search_spaces_remain_compact() -> None:
 
 def test_every_train_row_gets_one_outer_oof_prediction_and_no_test_rows_do() -> None:
     table = synthetic_feature_table()
-    result = run_nested_cv_model(table, "logistic", search_n_jobs=1)
+    result = run_nested_cv_model(training_rows(table), "logistic", search_n_jobs=1)
     train_identifiers = set(table.loc[table["Split"].eq("TRAIN"), "participant_id"])
     test_identifiers = set(table.loc[table["Split"].eq("TEST"), "participant_id"])
     assert len(result.oof_predictions) == len(train_identifiers)

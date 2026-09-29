@@ -79,7 +79,7 @@ def test_pipeline_keeps_preprocessing_inside_sklearn_pipeline_and_handles_missin
 
 
 def test_five_train_only_cv_folds_are_produced() -> None:
-    table = synthetic_feature_table()
+    table = training_rows(synthetic_feature_table())
     result = run_cross_validated_experiment(table, "ALL")
 
     assert len(result.cv_metrics) == 5

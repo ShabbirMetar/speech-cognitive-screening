@@ -39,6 +39,8 @@ Figures and a compact summary CSV are written to `artifacts/results/eda/`. The E
 
 The official TEST split must remain untouched during model development. Metadata-level descriptive plots may summarize the complete dataset for documentation, but predictive feature analysis, feature selection, model fitting, and hyperparameter tuning must operate only on TRAIN participants.
 
+Feature extraction was applied deterministically and uniformly to all PROCESS-2 samples before model fitting. All feature selection, cross-validation, hyperparameter tuning, model comparison and threshold selection are restricted to the predefined TRAIN partition. The predefined TEST feature rows are isolated and reserved for one final evaluation after the complete pipeline is frozen.
+
 ## Manual transcript processing
 
 PROCESS-2 transcripts can contain speaker labels, pause annotations, disfluencies, and contributions from other speakers. The manual transcript pipeline therefore extracts linguistic features from `Pat:` speech when that label is available and excludes `Oth:` speech. Pause annotations are recorded before cleaning and do not count as words.

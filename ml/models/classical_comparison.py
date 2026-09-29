@@ -32,12 +32,12 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import LinearSVC, SVC
 from xgboost import XGBClassifier
 
+from ml.data.development_guard import assert_train_only
 from ml.models.baseline_logistic import (
     METRIC_COLUMNS,
     TARGET_COLUMN,
     encode_screening_labels,
     select_feature_columns,
-    training_rows,
 )
 
 
@@ -250,7 +250,7 @@ def run_nested_cv_model(
 ) -> ModelResult:
     """Tune one model inside each outer TRAIN fold and save complete OOF data."""
 
-    train_table = training_rows(feature_table)
+    train_table = assert_train_only(feature_table)
     feature_names = resolve_linguistic_feature_columns(train_table, feature_columns)
     features = train_table[feature_names].apply(pd.to_numeric, errors="coerce")
     target = encode_screening_labels(train_table[TARGET_COLUMN]).to_numpy()

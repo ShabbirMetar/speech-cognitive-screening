@@ -23,6 +23,8 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
+from ml.data.development_guard import assert_train_only
+
 
 ExperimentName = Literal["SFT", "PFT", "CTD", "ALL"]
 TARGET_COLUMN = "screening_label"
@@ -136,7 +138,7 @@ def run_cross_validated_experiment(
 ) -> ExperimentResult:
     """Run deterministic 5-fold CV using only official TRAIN participants."""
 
-    train_table = training_rows(feature_table)
+    train_table = assert_train_only(feature_table)
     feature_names = select_feature_columns(train_table, experiment)
     features = train_table[feature_names].apply(pd.to_numeric, errors="coerce")
     target = encode_screening_labels(train_table[TARGET_COLUMN]).to_numpy()
@@ -214,6 +216,7 @@ def run_cross_validated_experiment(
 def run_all_experiments(feature_table: pd.DataFrame) -> dict[ExperimentName, ExperimentResult]:
     """Run SFT, PFT, CTD, and ALL TRAIN-only CV experiments."""
 
+    assert_train_only(feature_table)
     return {
         experiment: run_cross_validated_experiment(feature_table, experiment)
         for experiment in ("SFT", "PFT", "CTD", "ALL")
