@@ -11,3 +11,4 @@ xgboost
 librosa
 soundfile
 scipy
+faster-whisper
