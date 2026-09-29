@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from time import perf_counter
-from typing import Callable, Literal
+from typing import Callable, Literal, Sequence
 
 import numpy as np
 import pandas as pd
@@ -218,17 +218,40 @@ def _compact_parameters(parameters: dict[str, object]) -> dict[str, object]:
     return {key.removeprefix("classifier__"): value for key, value in parameters.items()}
 
 
+def resolve_linguistic_feature_columns(
+    train_table: pd.DataFrame, feature_columns: Sequence[str] | None = None
+) -> list[str]:
+    """Return validated ALL-feature columns or an explicit linguistic-only subset."""
+
+    all_linguistic_columns = select_feature_columns(train_table, "ALL")
+    if feature_columns is None:
+        return all_linguistic_columns
+    selected = list(feature_columns)
+    if len(selected) != len(set(selected)):
+        raise ValueError("Feature subset contains duplicate column names.")
+    non_linguistic = set(selected).difference(all_linguistic_columns)
+    if non_linguistic:
+        raise ValueError(
+            "Feature subset may contain only existing linguistic columns: "
+            f"{sorted(non_linguistic)}"
+        )
+    if not selected:
+        raise ValueError("Feature subset cannot be empty.")
+    return selected
+
+
 def run_nested_cv_model(
     feature_table: pd.DataFrame,
     model: ModelName,
     *,
     search_n_jobs: int = SEARCH_N_JOBS,
     progress_callback: Callable[[str], None] | None = None,
+    feature_columns: Sequence[str] | None = None,
 ) -> ModelResult:
     """Tune one model inside each outer TRAIN fold and save complete OOF data."""
 
     train_table = training_rows(feature_table)
-    feature_names = select_feature_columns(train_table, "ALL")
+    feature_names = resolve_linguistic_feature_columns(train_table, feature_columns)
     features = train_table[feature_names].apply(pd.to_numeric, errors="coerce")
     target = encode_screening_labels(train_table[TARGET_COLUMN]).to_numpy()
 
