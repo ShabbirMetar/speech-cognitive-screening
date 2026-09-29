@@ -12,7 +12,7 @@ This repository is the initial skeleton for a research prototype exploring speec
 
 PROCESS-2 is an external controlled-access research dataset. It remains outside this Git repository and must never be committed, copied, uploaded, or placed in the application source tree. Configure its local location through `PROCESS2_DATASET_PATH` in a local `.env` file based on `.env.example`.
 
-The application reads the local dataset location from `PROCESS2_DATASET_PATH`. Dataset files remain read-only and external to this repository. Metadata validation and descriptive EDA read the CSV without changing it; raw audio and transcripts are neither copied nor processed.
+The application reads the local dataset location from `PROCESS2_DATASET_PATH`. Dataset files remain read-only and external to this repository. Metadata validation and descriptive EDA read the CSV without changing it. Any approved audio or transcript processing is read-only and writes only derived local artifacts inside this repository; raw dataset files are never copied or altered.
 
 ## Local environment
 
@@ -73,6 +73,36 @@ cd D:\minorProject\Project\speech-cognitive-screening
 ```
 
 Outputs are written to `artifacts/results/baseline/`; out-of-fold predictions contain only anonymized participant identifiers.
+
+## Acoustic feature pilot
+
+The initial acoustic pipeline is a small, read-only TRAIN-only pilot. It uses librosa to calculate interpretable duration, energy, zero-crossing, spectral, MFCC, F0, energy-based silence/pause, and transcript-word-rate features for a reproducibly selected ten-participant subset. It does not train a model or evaluate the official TEST split.
+
+```powershell
+cd D:\minorProject\Project\speech-cognitive-screening
+.\.venv\Scripts\python.exe .\scripts\pilot_acoustic_features.py
+```
+
+The pilot writes derived features to `artifacts/features/acoustic_pilot_features.csv` and sanity-check plots to `artifacts/results/acoustic_pilot/`.
+
+Important limitations:
+
+- Librosa energy-based silence detection is an engineering baseline, not a clinically validated final VAD method.
+- Real-world background noise can affect silence and pause estimates.
+- Pitch extraction can fail; unavailable F0 values remain `NaN`.
+- Recording duration and transcript-derived word-rate estimates can be affected by other-speaker contributions.
+- Silero VAD or another speech detector may be evaluated later.
+
+## Frozen full acoustic extraction
+
+After the pilot parameters are approved, run the frozen extractor to create one participant row with task-prefixed acoustic features. It applies the same deterministic extractor to TRAIN and TEST recordings because no parameters are learned during extraction. It must not use TEST labels to alter thresholds, pitch settings, feature definitions, feature selection, model tuning, or model comparison.
+
+```powershell
+cd D:\minorProject\Project\speech-cognitive-screening
+.\.venv\Scripts\python.exe .\scripts\build_acoustic_features.py
+```
+
+Derived outputs are stored only under `artifacts/features/`: `acoustic_features.csv`, a participant-free frozen configuration record, and checkpoint files that allow interrupted processing to resume. A checkpoint is reused only when its configuration fingerprint matches the frozen extractor settings. Raw PROCESS-2 WAV files are never modified or resaved.
 
 ## Current status
 
