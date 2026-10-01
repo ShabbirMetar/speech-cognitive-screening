@@ -76,6 +76,21 @@ def _atomic_json_write(payload: dict[str, object], path: Path) -> None:
     temporary_path.replace(path)
 
 
+def format_timing_messages(
+    wall_clock_seconds: float, inference_seconds: float, completed_count: int, failures: int
+) -> tuple[str, str, str]:
+    """Label wall-clock loop duration separately from summed ASR inference time."""
+
+    if completed_count <= 0:
+        raise ValueError("completed_count must be positive when formatting ASR timing.")
+    return (
+        f"Wall-clock transcription loop runtime: {wall_clock_seconds:.1f} seconds; "
+        f"failures requiring retry: {failures}",
+        f"Summed ASR inference runtime: {inference_seconds:.1f} seconds",
+        f"Average ASR inference runtime/WAV: {inference_seconds / completed_count:.2f} seconds",
+    )
+
+
 def frozen_configuration_payload(config: WhisperTranscriptionConfig) -> dict[str, object]:
     """Produce the versioned configuration fingerprint required for checkpoint reuse."""
 
@@ -238,7 +253,8 @@ def main() -> int:
                 failures += 1
                 print(f"[{progress}/{len(remaining)}] {item.task}: failed ({error.__class__.__name__})", flush=True)
         elapsed = perf_counter() - started_at
-        print(f"Transcription pass runtime: {elapsed:.1f} seconds; failures requiring retry: {failures}")
+        loop_message, _, _ = format_timing_messages(elapsed, 0.0, 1, failures)
+        print(loop_message)
 
     validate_transcript_frame(completed, worklist)
     if len(completed) != len(worklist):
@@ -259,8 +275,11 @@ def main() -> int:
     print("========================")
     print(f"Transcriptions successful: {len(completed)}")
     print("Transcriptions failed: 0")
-    print(f"Total runtime: {total_runtime:.1f} seconds")
-    print(f"Average runtime/WAV: {total_runtime / len(completed):.2f} seconds")
+    _, inference_message, average_message = format_timing_messages(
+        0.0, total_runtime, len(completed), 0
+    )
+    print(inference_message)
+    print(average_message)
     print(f"Saved transcripts: {FINAL_TRANSCRIPT_PATH}")
     print(f"Saved ASR linguistic features: {ASR_FEATURE_PATH}")
     print(f"Saved deployment features: {DEPLOYMENT_FEATURE_PATH}")

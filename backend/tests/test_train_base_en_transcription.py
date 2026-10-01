@@ -23,6 +23,7 @@ from scripts.transcribe_train_base_en import (
     TRANSCRIPT_COLUMNS,
     _atomic_csv_write,
     build_train_worklist,
+    format_timing_messages,
     load_checkpoint,
     remaining_worklist,
     write_or_validate_frozen_config,
@@ -152,3 +153,10 @@ def test_script_paths_are_train_only_and_never_locked_test_artifacts() -> None:
     assert ACOUSTIC_TRAIN_PATH.name == "acoustic_features_train.csv"
     assert "LOCKED" not in str(LINGUISTIC_TRAIN_PATH)
     assert "LOCKED" not in str(ACOUSTIC_TRAIN_PATH)
+
+
+def test_timing_messages_distinguish_wall_clock_and_asr_inference() -> None:
+    loop, inference, average = format_timing_messages(10.25, 8.0, 4, 2)
+    assert loop == "Wall-clock transcription loop runtime: 10.2 seconds; failures requiring retry: 2"
+    assert inference == "Summed ASR inference runtime: 8.0 seconds"
+    assert average == "Average ASR inference runtime/WAV: 2.00 seconds"

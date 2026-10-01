@@ -108,4 +108,13 @@ Derived outputs are stored only under `artifacts/features/`: `acoustic_features.
 
 ## Current status
 
-The repository contains a health-check FastAPI service, a minimal React landing page, read-only PROCESS-2 validation, and metadata EDA. Cognitive screening, audio/NLP processing, feature extraction, and machine-learning models have not been implemented.
+Completed research-pipeline stages are:
+
+- PROCESS-2 validation and metadata EDA.
+- Manual transcript parsing and linguistic feature extraction.
+- Frozen full acoustic feature extraction and TRAIN/locked-TEST feature partitioning.
+- TRAIN-only nested-CV linguistic/classical, acoustic-baseline, and pure-acoustic modality-comparison experiments.
+- faster-whisper `base.en` pilot and full TRAIN-only transcription (320 participants, 960 recordings), followed by ASR linguistic and deployment-feature generation.
+- TRAIN-only deployment representation comparison across manual, ASR, ASR-rate, and pure-acoustic multimodal representations.
+
+The React/FastAPI application remains a skeleton. No final deployment model, threshold, explainability workflow, or official TEST evaluation has been selected or performed.
