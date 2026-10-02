@@ -1,0 +1,4 @@
+comparison,minuend_representation,subtrahend_representation,f1_delta_mean,f1_delta_std
+compact early fusion - ASR_RATE,ASR_RATE_PLUS_CTD,ASR_RATE,0.009998083480037345,0.04218904609646153
+late fusion - ASR_RATE,LATE_FUSION_ASR_CTD,ASR_RATE,-0.007937324178685267,0.022772994426563914
+late fusion - compact early fusion,LATE_FUSION_ASR_CTD,ASR_RATE_PLUS_CTD,-0.01793540765872261,0.02674746075872699

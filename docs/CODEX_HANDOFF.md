@@ -74,9 +74,31 @@ Paired fold-wise F1 deltas (mean ± SD; descriptive only, no significance claims
 
 Earlier reference results: manual linguistic/classical Logistic Regression had F1 0.676 and ROC-AUC 0.762; CTD pure acoustic Logistic Regression had F1 0.605 ± 0.076 and ROC-AUC 0.668 ± 0.084. These are research-reference experiments, not deployment-model choices.
 
+## Focused fusion-strategy results
+
+The final planned TRAIN-only fusion-strategy experiment compared the 38-feature ASR-rate representation, the 13-feature CTD pure-acoustic subset, a 51-feature compact early fusion, and separate probability-level late fusion. All use the same fixed outer folds. Late fusion tunes ASR/CTD Logistic Regression `C` values and `alpha ∈ {0.6, 0.7, 0.8, 0.9}` only inside each outer fold's inner CV; class metrics use the fixed 0.5 threshold.
+
+| Representation | Features/mode | F1 (mean ± SD) | ROC-AUC (mean ± SD) | Train–validation F1 gap |
+|---|---|---:|---:|---:|
+| ASR_RATE | 38 | 0.640 ± 0.088 | 0.713 ± 0.079 | 0.081 |
+| CTD_ACOUSTIC | 13 | 0.605 ± 0.076 | 0.668 ± 0.084 | 0.056 |
+| ASR_RATE_PLUS_CTD | 51 compact early fusion | 0.650 ± 0.085 | 0.717 ± 0.079 | 0.073 |
+| LATE_FUSION_ASR_CTD | separate 38 + 13 pipelines | 0.632 ± 0.079 | 0.721 ± 0.090 | 0.081 |
+| DEPLOYMENT_MULTIMODAL_REFERENCE | 77-feature earlier early fusion, not rerun | 0.616 ± 0.068 | 0.697 ± 0.066 | 0.137 |
+
+Paired F1 deltas (mean ± SD; descriptive only):
+
+- Compact early fusion minus ASR_RATE: +0.010 ± 0.042.
+- Late fusion minus ASR_RATE: -0.008 ± 0.023.
+- Late fusion minus compact early fusion: -0.018 ± 0.027.
+
+Late-fusion inner selections by outer fold were: alpha 0.7, 0.7, 0.8, 0.9, and 0.7; ASR-rate C values 1.0, 1.0, 0.1, 0.1, and 0.1; CTD-acoustic C values 10.0, 0.1, 0.1, 0.1, and 10.0. Compact early fusion has the highest observed mean F1 in this focused comparison, but its small fold-wise improvement is inconsistent. These results do not justify removing acoustic analysis or making significance claims.
+
+Artifacts: `artifacts/results/fusion_strategy_comparison/`.
+
 ## Current task and immediate next task
 
-The requested deployment representation comparison is complete. Stop here for this task. The next task requires an explicit decision about whether to investigate the observed ASR/deployment degradation (for example, a pre-specified Honoré ablation or other TRAIN-only robustness study) before freezing a final deployment representation. Do not perform official TEST evaluation until that pipeline and threshold are frozen.
+The requested fusion-strategy comparison is complete. Stop here for this task. The next task requires an explicit decision about the deployment representation to freeze; do not begin another feature-fusion search. Threshold selection, final fitting, explainability, and official TEST evaluation remain later stages after that decision.
 
 ## Explicitly do not do
 
@@ -85,4 +107,5 @@ The requested deployment representation comparison is complete. Stop here for th
 - Do not use TEST for feature selection, tuning, thresholds, model choice, SHAP, or comparison.
 - Do not call the current multimodal result superior; its observed F1 and ROC-AUC were lower than ASR linguistic and its F1 gap was larger.
 - Do not remove acoustic features from the project objective based solely on this result.
+- Do not treat the compact early-fusion F1 increase as definitive; it is small and inconsistent across five folds.
 - Do not claim diagnosis, clinical validation, or significance from five folds.
