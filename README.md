@@ -1,12 +1,12 @@
 # Speech-Based Cognitive Decline Screening
 
-This repository is the initial skeleton for a research prototype exploring speech-based cognitive decline screening. It is not a clinical diagnostic tool and makes no claims about model performance or accuracy.
+This repository contains a research prototype for preliminary speech-based cognitive-decline screening. It is not a clinical diagnostic tool and must not be presented as a diagnosis, medical probability, or clinically validated assessment.
 
 ## Architecture
 
 - `frontend/`: React application built with Vite and JavaScript.
 - `backend/`: FastAPI service for application APIs and configuration.
-- `ml/`: Reserved locations for future data interfaces, audio/NLP/ASR work, feature engineering, models, and explainability.
+- `ml/`: Data interfaces, audio/NLP/ASR work, feature engineering, models, and reusable explainability helpers.
 
 ## Research data
 
@@ -116,5 +116,19 @@ Completed research-pipeline stages are:
 - TRAIN-only nested-CV linguistic/classical, acoustic-baseline, and pure-acoustic modality-comparison experiments.
 - faster-whisper `base.en` pilot and full TRAIN-only transcription (320 participants, 960 recordings), followed by ASR linguistic and deployment-feature generation.
 - TRAIN-only deployment representation comparison across manual, ASR, ASR-rate, and pure-acoustic multimodal representations.
+- Focused TRAIN-only fusion comparison. The frozen deployment representation is `ASR_RATE_PLUS_CTD`: 32 ASR-compatible linguistic features, 6 ASR-count-derived speech-rate features, and 13 CTD waveform-only acoustic features (51 total). Logistic Regression is the frozen classifier family.
+- TRAIN-only calibration and threshold analysis. Raw Logistic Regression classifier scores are retained; the primary research operating threshold is `0.53`, selected independently by maximum balanced accuracy and Youden J on TRAIN out-of-fold scores. It is not a clinical or validated diagnostic threshold.
+- TRAIN-only SHAP explainability for the frozen 51-feature Logistic Regression model. SHAP values are calculated on the standardized model log-odds scale; they describe model behaviour, not causal or clinical biomarkers. Outputs are in `artifacts/results/explainability/`.
 
-The React/FastAPI application remains a skeleton. No final deployment model, threshold, explainability workflow, or official TEST evaluation has been selected or performed.
+The current explainability fit selected `C=0.1` with five-fold TRAIN CV F1 selection (`0.650 ± 0.076` across folds). Its strongest global mean-absolute-SHAP features include PFT P-initial word count/ratio, CTD mean voice energy, SFT repeated-word count, and CTD silence ratio. The exact tables and figures are saved with the artifact outputs.
+
+No final all-TRAIN serialized deployment artifact has been created, and the official TEST partition has not been evaluated. FastAPI ML integration and the React microphone workflow remain future stages.
+
+Run the reproducible, TRAIN-only explainability analysis with:
+
+```powershell
+cd D:\minorProject\Project\speech-cognitive-screening
+.\.venv\Scripts\python.exe .\scripts\analyze_model_explainability.py
+```
+
+The display-only Cognitive Speech Screening Score is `raw classifier score × 100`. It is not a probability of dementia, disease, or clinical risk percentage. At the TRAIN-derived research operating point, a raw score of at least `0.53` maps to “Possible impairment-like speech pattern”; lower scores map to “Healthy-like speech pattern.”

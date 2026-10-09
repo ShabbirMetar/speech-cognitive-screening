@@ -33,6 +33,8 @@ Development code must call `ml.data.development_guard.assert_train_only`; it mus
 5. faster-whisper ASR pilot: `base.en` is frozen for deployment. On 30 pilot WAVs it achieved overall WER 0.342 and mean runtime 3.45 s/WAV; `small.en` is not a current option.
 6. Full TRAIN-only `base.en` transcription: 960/960 successful, 0 failed. Outputs include ASR transcripts, ASR linguistic features, and deployment features.
 7. TRAIN-only deployment representation comparison completed on 2026-10-02.
+8. Focused TRAIN-only fusion strategy comparison and freeze of the 51-feature `ASR_RATE_PLUS_CTD` representation.
+9. TRAIN-only calibration, threshold, and explainability analysis completed. No TEST rows were loaded, transcribed, or evaluated.
 
 ## Frozen decisions
 
@@ -40,9 +42,11 @@ Development code must call `ml.data.development_guard.assert_train_only`; it mus
 - Preserve acoustic features as a core project modality even when their standalone or fused performance is weaker.
 - Frozen deployment representation: `ASR_RATE_PLUS_CTD`, with 51 predictors: 32 ASR linguistic features, 6 ASR-count-derived speech-rate features, and 13 CTD pure acoustic pause/prosodic/energy features.
 - Frozen classifier family: Logistic Regression with fold-local median imputation, standard scaling, and inner-CV selection from `C = [0.1, 1.0, 10.0]`.
+- Raw Logistic Regression classifier scores are retained; sigmoid calibration is not adopted.
+- Primary research operating threshold: `0.53`, derived from TRAIN out-of-fold predictions because both maximum balanced accuracy and maximum Youden J selected it. This is not a clinical, medical, or validated diagnostic threshold. The lower sensitivity-oriented thresholds remain descriptive alternatives only.
 - Keep age, gender, and MMSE out of the primary predictive model.
 - Handle missing Honoré statistics with fold-local median imputation; do not drop them without a separately specified ablation.
-- Use interpretable/regularized models before complex models. No final model or threshold has been selected.
+- Use interpretable/regularized models before complex models. The all-TRAIN serialized production artifact has not yet been created.
 
 ## Current artifacts
 
@@ -53,6 +57,7 @@ Development code must call `ml.data.development_guard.assert_train_only`; it mus
 - Full ASR transcripts: `artifacts/transcripts/asr_train/base_en_train_transcripts.csv` — 960 rows.
 - ASR quality: `artifacts/results/asr_train_feature_quality.csv`. `pft_honore_statistic` has 67 missing and `sft_honore_statistic` has 55 missing; no ASR linguistic feature is infinite or constant.
 - Latest comparison: `artifacts/results/deployment_representation_comparison/`.
+- Explainability outputs: `artifacts/results/explainability/` — global SHAP/standardized-coefficient tables, feature-group reliance, deterministic TRAIN-only example explanations, figures, and provenance metadata.
 
 ## Actual observed metrics
 
@@ -121,11 +126,19 @@ Objective raw-score threshold candidates (TRAIN OOF only) are:
 | Sensitivity at least 0.75 (descriptive) | 0.39 | 0.769 | 0.475 | 0.670 | 0.622 |
 | Sensitivity at least 0.80 (descriptive) | 0.37 | 0.806 | 0.444 | 0.683 | 0.625 |
 
-No operating threshold is clinically validated or finally selected. The output records objective candidates only; sensitivity-target rows are descriptive and do not imply a clinical target. Artifacts: `artifacts/results/screening_threshold/`.
+The primary research operating threshold is now frozen at `0.53` because maximum balanced accuracy and maximum Youden J independently selected it from the TRAIN OOF sweep. It is not clinically validated and must be described only as a TRAIN-derived research operating point. Sensitivity-target rows remain descriptive and do not imply a clinical target. Artifacts: `artifacts/results/screening_threshold/`.
+
+## TRAIN-only explainability
+
+The frozen 51-feature Logistic Regression representation was fitted once on all 320 TRAIN participants after a five-fold TRAIN-only F1 resolution of `C ∈ {0.1, 1.0, 10.0}`. `C = 0.1` was selected (mean CV F1 0.650 ± 0.076); this resolution is not a new model-family or representation comparison. The all-TRAIN fit is used for explanation only and does not provide held-out performance.
+
+`shap.LinearExplainer` receives the same median-imputed and standardized matrix used by the classifier. SHAP values are on the model log-odds scale, not the probability scale, and reconstruct the fitted decision function with maximum numerical error `1.776e-15`. The global mean-absolute-SHAP group shares are ASR linguistic 63.9%, ASR rate 9.6%, and CTD acoustic 26.5%. These are descriptive model-reliance summaries, not causal or clinical biomarker importance.
+
+The leading global features were PFT P-initial word count, PFT P-initial ratio, CTD mean voice energy, SFT repeated-word count, PFT average word length, PFT Honoré vocabulary richness, SFT Brunet vocabulary richness, and CTD silence ratio. Their directions describe this fitted model only; they must not be interpreted as causal effects. Deterministic low-score, near-threshold, and high-score TRAIN examples are included solely for demonstration in `artifacts/results/explainability/example_explanations.csv` and are not held-out evidence.
 
 ## Current task and immediate next task
 
-The requested calibration and threshold analysis is complete. Stop here for this task. The next task requires an explicit decision about whether and how to freeze an operating threshold for the research prototype, followed later by final model fitting, explainability, and one official TEST evaluation. Do not begin another representation/model search.
+The calibration, threshold, and explainability stages are complete. The next task is final all-TRAIN fitting, artifact serialization, and complete deployment-pipeline freeze: ASR configuration, feature schema/order, imputer, scaler, classifier, raw-score terminology, and the 0.53 research operating threshold. Only after that freeze may one official TEST evaluation be performed. Do not begin another representation/model search.
 
 ## Explicitly do not do
 

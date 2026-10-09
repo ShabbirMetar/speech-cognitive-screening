@@ -1,0 +1,52 @@
+feature,feature_label,coefficient,absolute_coefficient,direction
+pft_p_initial_word_count,PFT P-initial Word Count,-0.4706552858856115,0.4706552858856115,Toward Healthy-like class
+pft_p_initial_ratio,PFT P-initial Word Ratio,-0.3968708283164799,0.3968708283164799,Toward Healthy-like class
+ctd_rms_mean,CTD Mean Voice Energy,-0.26627023816914647,0.26627023816914647,Toward Healthy-like class
+sft_repeated_word_count,SFT Repeated Word Count,0.26063519744056396,0.26063519744056396,Toward Possible impairment-like class
+pft_honore_statistic,PFT Honoré Vocabulary Richness,0.21924867337245085,0.21924867337245085,Toward Possible impairment-like class
+pft_articulation_rate_wpm,PFT Articulation Rate,-0.20554925340877594,0.20554925340877594,Toward Healthy-like class
+ctd_pause_mean_seconds,CTD Mean Pause Duration,0.20450957352469504,0.20450957352469504,Toward Possible impairment-like class
+pft_average_word_length,PFT Average Word Length,-0.20221307587719078,0.20221307587719078,Toward Healthy-like class
+ctd_filler_ratio,CTD Filler Ratio,0.18447246351590324,0.18447246351590324,Toward Possible impairment-like class
+sft_brunet_index,SFT Brunet Vocabulary Richness,-0.18122087007071389,0.18122087007071389,Toward Healthy-like class
+pft_brunet_index,PFT Brunet Vocabulary Richness,-0.18058099938899969,0.18058099938899969,Toward Healthy-like class
+ctd_silence_ratio,CTD Silence Ratio,0.179383029655805,0.179383029655805,Toward Possible impairment-like class
+sft_unique_word_count,SFT Unique Word Count,-0.17796504526861207,0.17796504526861207,Toward Healthy-like class
+ctd_f0_std_hz,CTD Pitch Variability,-0.17042025019461843,0.17042025019461843,Toward Healthy-like class
+ctd_filler_count,CTD Filler Count,-0.16830727650661095,0.16830727650661095,Toward Healthy-like class
+ctd_silence_duration_seconds,CTD Silence Duration,-0.16498797366957488,0.16498797366957488,Toward Healthy-like class
+ctd_repeated_word_count,CTD Repeated Word Count,0.1649794957267096,0.1649794957267096,Toward Possible impairment-like class
+ctd_brunet_index,CTD Brunet Vocabulary Richness,-0.15079311528723097,0.15079311528723097,Toward Healthy-like class
+ctd_rms_std,CTD Voice-Energy Variability,0.14542886622011056,0.14542886622011056,Toward Possible impairment-like class
+sft_type_token_ratio,SFT Lexical Diversity (TTR),-0.12735852814750698,0.12735852814750698,Toward Healthy-like class
+sft_repetition_ratio,SFT Repetition Ratio,0.12735852814750684,0.12735852814750684,Toward Possible impairment-like class
+ctd_honore_statistic,CTD Honoré Vocabulary Richness,-0.11035781180203988,0.11035781180203988,Toward Healthy-like class
+pft_repetition_ratio,PFT Repetition Ratio,0.11019498471299286,0.11019498471299286,Toward Possible impairment-like class
+pft_type_token_ratio,PFT Lexical Diversity (TTR),-0.11019498471299276,0.11019498471299276,Toward Healthy-like class
+ctd_f0_mean_hz,CTD Mean Pitch,-0.09372110544473497,0.09372110544473497,Toward Healthy-like class
+sft_articulation_rate_wpm,SFT Articulation Rate,0.08713923431186897,0.08713923431186897,Toward Possible impairment-like class
+pft_recording_word_rate_wpm,PFT Speech Rate,0.08447367581570284,0.08447367581570284,Toward Possible impairment-like class
+ctd_recording_word_rate_wpm,CTD Speech Rate,-0.08056345289855832,0.08056345289855832,Toward Healthy-like class
+ctd_word_count,CTD Word Count,0.07899134825976449,0.07899134825976449,Toward Possible impairment-like class
+ctd_pause_total_seconds,CTD Total Pause Duration,0.07844215297952109,0.07844215297952109,Toward Possible impairment-like class
+sft_honore_statistic,SFT Honoré Vocabulary Richness,0.06992036131460076,0.06992036131460076,Toward Possible impairment-like class
+pft_filler_ratio,PFT Filler Ratio,-0.06390668872924303,0.06390668872924303,Toward Healthy-like class
+sft_recording_word_rate_wpm,SFT Speech Rate,-0.060923405481453016,0.060923405481453016,Toward Healthy-like class
+ctd_pause_count,CTD Pause Count,0.05738718008611863,0.05738718008611863,Toward Possible impairment-like class
+sft_filler_ratio,SFT Filler Ratio,-0.05623135125730231,0.05623135125730231,Toward Healthy-like class
+ctd_voiced_duration_seconds,CTD Voiced Duration,0.05414611314021322,0.05414611314021322,Toward Possible impairment-like class
+ctd_articulation_rate_wpm,CTD Articulation Rate,0.05214589453275676,0.05214589453275676,Toward Possible impairment-like class
+ctd_unique_word_count,CTD Unique Word Count,-0.05126172166552075,0.05126172166552075,Toward Healthy-like class
+ctd_average_word_length,CTD Average Word Length,-0.049882503453226354,0.049882503453226354,Toward Healthy-like class
+pft_word_count,PFT Word Count,0.04616984396131209,0.04616984396131209,Toward Possible impairment-like class
+pft_unique_word_count,PFT Unique Word Count,0.04165883581621455,0.04165883581621455,Toward Possible impairment-like class
+ctd_type_token_ratio,CTD Lexical Diversity (TTR),0.034353124841989956,0.034353124841989956,Toward Possible impairment-like class
+ctd_repetition_ratio,CTD Repetition Ratio,-0.03435312484198971,0.03435312484198971,Toward Healthy-like class
+pft_filler_count,PFT Filler Count,0.031005772116527698,0.031005772116527698,Toward Possible impairment-like class
+pft_repeated_word_count,PFT Repeated Word Count,0.027916585154186293,0.027916585154186293,Toward Possible impairment-like class
+sft_word_count,SFT Word Count,-0.026310443530132174,0.026310443530132174,Toward Healthy-like class
+sft_filler_count,SFT Filler Count,0.01931883777002,0.01931883777002,Toward Possible impairment-like class
+ctd_audio_duration_seconds,CTD Recording Duration,-0.01735596341158251,0.01735596341158251,Toward Healthy-like class
+ctd_f0_range_hz,CTD Pitch Range,-0.005090078253997415,0.005090078253997415,Toward Healthy-like class
+sft_average_word_length,SFT Average Word Length,0.0032780271867534102,0.0032780271867534102,Toward Possible impairment-like class
+ctd_pause_max_seconds,CTD Maximum Pause Duration,-0.0012499751244986336,0.0012499751244986336,Toward Healthy-like class
