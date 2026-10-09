@@ -38,6 +38,8 @@ Development code must call `ml.data.development_guard.assert_train_only`; it mus
 
 - Use faster-whisper `base.en`, CPU, `int8`, English, 4 CPU threads, one worker for deployment-oriented ASR. Do not introduce Whisper medium or revisit small.en unless explicitly asked.
 - Preserve acoustic features as a core project modality even when their standalone or fused performance is weaker.
+- Frozen deployment representation: `ASR_RATE_PLUS_CTD`, with 51 predictors: 32 ASR linguistic features, 6 ASR-count-derived speech-rate features, and 13 CTD pure acoustic pause/prosodic/energy features.
+- Frozen classifier family: Logistic Regression with fold-local median imputation, standard scaling, and inner-CV selection from `C = [0.1, 1.0, 10.0]`.
 - Keep age, gender, and MMSE out of the primary predictive model.
 - Handle missing Honoré statistics with fold-local median imputation; do not drop them without a separately specified ablation.
 - Use interpretable/regularized models before complex models. No final model or threshold has been selected.
@@ -96,9 +98,34 @@ Late-fusion inner selections by outer fold were: alpha 0.7, 0.7, 0.8, 0.9, and 0
 
 Artifacts: `artifacts/results/fusion_strategy_comparison/`.
 
+## TRAIN-only calibration and threshold analysis
+
+The frozen 51-feature Logistic Regression representation was evaluated with one outer-fold OOF classifier score per TRAIN participant. Each outer fold tuned `C` only within its outer-TRAIN partition. The raw score is a **classifier probability-like screening score**, not a disease or dementia probability.
+
+Calibration metrics below pool all 320 OOF predictions. Therefore the raw pooled OOF ROC-AUC (0.7137) is not expected to equal the earlier mean of five fold-level ROC-AUC values (0.7172); the underlying 320 OOF scores, labels, folds, and predictions are identical.
+
+| Score source | Brier score | Log loss | ROC-AUC |
+|---|---:|---:|---:|
+| Raw Logistic Regression | 0.2167 | 0.6559 | 0.7137 |
+| Sigmoid-calibrated Logistic Regression | 0.2179 | 0.6357 | 0.7115 |
+
+Sigmoid calibration was cross-fitted within each outer TRAIN fold as a diagnostic comparator. It improved log loss but slightly worsened Brier score and ROC-AUC, so raw Logistic Regression scores remain the operating-score source; no automatic calibration change was made.
+
+Objective raw-score threshold candidates (TRAIN OOF only) are:
+
+| Rule | Threshold | Sensitivity | Specificity | F1 | Balanced accuracy |
+|---|---:|---:|---:|---:|---:|
+| Max F1 | 0.27 | 0.919 | 0.300 | 0.702 | 0.609 |
+| Max balanced accuracy / Youden J | 0.53 | 0.594 | 0.744 | 0.642 | 0.669 |
+| Sensitivity at least 0.70 (descriptive) | 0.43 | 0.700 | 0.556 | 0.653 | 0.628 |
+| Sensitivity at least 0.75 (descriptive) | 0.39 | 0.769 | 0.475 | 0.670 | 0.622 |
+| Sensitivity at least 0.80 (descriptive) | 0.37 | 0.806 | 0.444 | 0.683 | 0.625 |
+
+No operating threshold is clinically validated or finally selected. The output records objective candidates only; sensitivity-target rows are descriptive and do not imply a clinical target. Artifacts: `artifacts/results/screening_threshold/`.
+
 ## Current task and immediate next task
 
-The requested fusion-strategy comparison is complete. Stop here for this task. The next task requires an explicit decision about the deployment representation to freeze; do not begin another feature-fusion search. Threshold selection, final fitting, explainability, and official TEST evaluation remain later stages after that decision.
+The requested calibration and threshold analysis is complete. Stop here for this task. The next task requires an explicit decision about whether and how to freeze an operating threshold for the research prototype, followed later by final model fitting, explainability, and one official TEST evaluation. Do not begin another representation/model search.
 
 ## Explicitly do not do
 
@@ -108,4 +135,5 @@ The requested fusion-strategy comparison is complete. Stop here for this task. T
 - Do not call the current multimodal result superior; its observed F1 and ROC-AUC were lower than ASR linguistic and its F1 gap was larger.
 - Do not remove acoustic features from the project objective based solely on this result.
 - Do not treat the compact early-fusion F1 increase as definitive; it is small and inconsistent across five folds.
+- Do not call any TRAIN-derived threshold clinically validated or present a classifier score as probability of dementia, disease, or diagnostic confidence.
 - Do not claim diagnosis, clinical validation, or significance from five folds.

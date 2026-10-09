@@ -1,0 +1,3 @@
+score_source,calibration_method,brier_score,log_loss,roc_auc
+raw_logistic,none,0.21674911799243257,0.6558658429852636,0.7137109375
+sigmoid_logistic,sigmoid,0.21791891066858468,0.6357226138099593,0.711484375
