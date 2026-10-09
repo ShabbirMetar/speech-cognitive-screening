@@ -122,7 +122,7 @@ Completed research-pipeline stages are:
 
 The current explainability fit selected `C=0.1` with five-fold TRAIN CV F1 selection (`0.650 ± 0.076` across folds). Its strongest global mean-absolute-SHAP features include PFT P-initial word count/ratio, CTD mean voice energy, SFT repeated-word count, and CTD silence ratio. The exact tables and figures are saved with the artifact outputs.
 
-No final all-TRAIN serialized deployment artifact has been created, and the official TEST partition has not been evaluated. FastAPI ML integration and the React microphone workflow remain future stages.
+The final all-TRAIN serialized pipeline, strict 51-feature schema, deployment metadata, and SHA-256 manifest are now available under `artifacts/models/`. The official TEST partition has not been evaluated. The next ML stage is one-time official TEST evaluation; FastAPI ML integration and the React microphone workflow remain future stages.
 
 Run the reproducible, TRAIN-only explainability analysis with:
 

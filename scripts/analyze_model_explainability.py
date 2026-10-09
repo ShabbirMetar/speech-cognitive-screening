@@ -387,7 +387,7 @@ def main() -> int:
     print(f"\nResearch operating threshold: {RESEARCH_OPERATING_THRESHOLD:.2f}")
     print("Example explanation scores (TRAIN demonstrations only):")
     for row in examples.itertuples(index=False):
-        print(f"  {row.selection_rule}: {row.raw_model_score:.3f} ({row.classification_at_0_53})")
+        print(f"  {row.selection_rule}: {row.raw_model_score:.4f} ({row.classification_at_0_53})")
     print(f"\nSHAP log-odds reconstruction max error: {max_reconstruction_error:.3e}")
     print(f"Saved outputs: {OUTPUT_DIRECTORY}")
     return 0

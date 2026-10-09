@@ -35,6 +35,7 @@ Development code must call `ml.data.development_guard.assert_train_only`; it mus
 7. TRAIN-only deployment representation comparison completed on 2026-10-02.
 8. Focused TRAIN-only fusion strategy comparison and freeze of the 51-feature `ASR_RATE_PLUS_CTD` representation.
 9. TRAIN-only calibration, threshold, and explainability analysis completed. No TEST rows were loaded, transcribed, or evaluated.
+10. Final all-TRAIN Logistic Regression pipeline fitted once and frozen with its exact 51-feature schema, model metadata, ASR configuration reference, and SHA-256 integrity manifest. No TEST rows were loaded or evaluated.
 
 ## Frozen decisions
 
@@ -46,7 +47,7 @@ Development code must call `ml.data.development_guard.assert_train_only`; it mus
 - Primary research operating threshold: `0.53`, derived from TRAIN out-of-fold predictions because both maximum balanced accuracy and maximum Youden J selected it. This is not a clinical, medical, or validated diagnostic threshold. The lower sensitivity-oriented thresholds remain descriptive alternatives only.
 - Keep age, gender, and MMSE out of the primary predictive model.
 - Handle missing Honoré statistics with fold-local median imputation; do not drop them without a separately specified ablation.
-- Use interpretable/regularized models before complex models. The all-TRAIN serialized production artifact has not yet been created.
+- Use interpretable/regularized models before complex models. The final all-TRAIN serialized artifact is frozen at model version `1.0.0`: median imputer, StandardScaler, and Logistic Regression `C=0.1`, `max_iter=2000`, `random_state=42`.
 
 ## Current artifacts
 
@@ -58,6 +59,7 @@ Development code must call `ml.data.development_guard.assert_train_only`; it mus
 - ASR quality: `artifacts/results/asr_train_feature_quality.csv`. `pft_honore_statistic` has 67 missing and `sft_honore_statistic` has 55 missing; no ASR linguistic feature is infinite or constant.
 - Latest comparison: `artifacts/results/deployment_representation_comparison/`.
 - Explainability outputs: `artifacts/results/explainability/` — global SHAP/standardized-coefficient tables, feature-group reliance, deterministic TRAIN-only example explanations, figures, and provenance metadata.
+- Frozen inference artifacts: `artifacts/models/cognitive_screening_pipeline.joblib`, `artifacts/models/feature_schema.json`, `artifacts/models/model_metadata.json`, and `artifacts/models/model_manifest.json`. The manifest validates SHA-256 hashes for the pipeline, schema, metadata, and the existing frozen TRAIN ASR configuration.
 
 ## Actual observed metrics
 
@@ -136,9 +138,17 @@ The frozen 51-feature Logistic Regression representation was fitted once on all 
 
 The leading global features were PFT P-initial word count, PFT P-initial ratio, CTD mean voice energy, SFT repeated-word count, PFT average word length, PFT Honoré vocabulary richness, SFT Brunet vocabulary richness, and CTD silence ratio. Their directions describe this fitted model only; they must not be interpreted as causal effects. Deterministic low-score, near-threshold, and high-score TRAIN examples are included solely for demonstration in `artifacts/results/explainability/example_explanations.csv` and are not held-out evidence.
 
+The near-threshold demonstration score is `0.5298280909878464`, which is below `0.53` and therefore correctly receives the Healthy-like label. The prior `0.530` display was rounding only; the console now prints example scores to four decimal places.
+
+## Final all-TRAIN artifact freeze
+
+`scripts/freeze_final_model.py` fitted the already-selected Logistic Regression pipeline exactly once on all 320 TRAIN participants, with the frozen 51-feature order and `C=0.1`. It reports no training performance. The serialized pipeline contains the median imputer, StandardScaler, and classifier together so inference never fits preprocessing again.
+
+`feature_schema.json` rejects missing, duplicate, or unexpected features and explicitly reorders valid shuffled columns to the frozen feature order. `model_metadata.json` records the non-clinical score terminology, raw-score threshold rule, base.en CPU/int8/English ASR configuration, feature provenance, exclusions, and clearly labelled TRAIN-only development/OOF metrics. `model_manifest.json` records the environment and SHA-256 values. Its 320-row pre-save/post-load probability check had maximum absolute difference `0.0`.
+
 ## Current task and immediate next task
 
-The calibration, threshold, and explainability stages are complete. The next task is final all-TRAIN fitting, artifact serialization, and complete deployment-pipeline freeze: ASR configuration, feature schema/order, imputer, scaler, classifier, raw-score terminology, and the 0.53 research operating threshold. Only after that freeze may one official TEST evaluation be performed. Do not begin another representation/model search.
+The calibration, threshold, explainability, and final all-TRAIN artifact-freeze stages are complete. The next task is the one-time official TEST evaluation using the frozen pipeline, feature schema/order, raw score, and `0.53` TRAIN-derived research threshold. Do not begin another representation/model search or modify the frozen configuration before that evaluation.
 
 ## Explicitly do not do
 
