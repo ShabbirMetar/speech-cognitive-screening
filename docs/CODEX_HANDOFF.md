@@ -38,6 +38,7 @@ Development code must call `ml.data.development_guard.assert_train_only`; it mus
 10. Final all-TRAIN Logistic Regression pipeline fitted once and frozen with its exact 51-feature schema, model metadata, ASR configuration reference, and SHA-256 integrity manifest. No TEST rows were used to fit or alter it.
 11. One-time official held-out TEST evaluation completed with the frozen pipeline. The authoritative persisted output bundle contains 80 participant predictions and 240 frozen-ASR recordings; no TEST-based fitting, tuning, calibration, feature selection, threshold selection, or model modification occurred.
 12. Production FastAPI inference integration completed without PROCESS-2 runtime dependency. It loads and hash-validates the frozen artifacts at startup, initializes one frozen faster-whisper `base.en` CPU model, accepts transient SFT/PFT/CTD uploads, reuses the frozen 51-feature assembly, and performs inference only.
+13. React assessment workflow completed. It provides disclaimer/readiness, SFT/PFT/CTD microphone recording, review, real FastAPI submission, CPU-processing feedback, accessible results/explanations, and a privacy-preserving reset without changing the frozen ML pipeline.
 
 ## Frozen decisions
 
@@ -65,6 +66,7 @@ Development code must call `ml.data.development_guard.assert_train_only`; it mus
 - Frozen inference artifacts: `artifacts/models/cognitive_screening_pipeline.joblib`, `artifacts/models/feature_schema.json`, `artifacts/models/model_metadata.json`, and `artifacts/models/model_manifest.json`. The manifest validates SHA-256 hashes for the pipeline, schema, metadata, and the existing frozen TRAIN ASR configuration.
 - Authoritative official TEST record: `artifacts/results/official_test_evaluation/` — persisted predictions, fixed-threshold metrics, 2,000-replicate descriptive bootstrap confidence intervals, descriptive diagnosis breakdown, metadata, and plots. Inspect these files directly; do **not** rerun the evaluator after TEST consumption.
 - FastAPI inference: `backend/app/services/screening_service.py`, `backend/app/api/screening.py`, and `backend/app/api/schemas.py`. Endpoints are `GET /api/health`, `GET /api/v1/screening/model-info`, and `POST /api/v1/screening/analyze` with `sft_audio`, `pft_audio`, and `ctd_audio` multipart fields. User audio/transcripts are temporary by default.
+- React interface: `frontend/src/App.jsx`, reusable components under `frontend/src/components/`, `frontend/src/services/api.js`, and `frontend/src/utils/wavEncoder.js`. The browser records in its supported MediaRecorder container, converts the in-memory recording to PCM16 WAV without denoising/resampling/normalization, and uploads the exact three backend field names. No speech blob is written to local storage.
 
 ## Actual observed metrics
 
@@ -175,11 +177,13 @@ The original-diagnosis descriptive breakdown is HC 33 Healthy-like / 7 Possible 
 
 During the first authorized held-out evaluation, two evaluator processes were inadvertently active concurrently before atomic single-run protection was introduced. Both used the same frozen model, feature schema, preprocessing, and threshold; no development decision changed between them. The duplicate process reported F1 0.800 and ROC-AUC 0.848 and is retained as an execution anomaly for transparency, not as another validation cohort or an alternative result. The finalized persisted bundle was designated authoritative by a procedural artifact-precedence rule rather than selecting the more favorable result. `scripts/evaluate_official_test.py` now retains an atomic lock for an attempted evaluation and refuses any subsequent invocation once `evaluation_metadata.json` exists. Do not rerun it; inspect the saved bundle and `docs/OFFICIAL_TEST_EVALUATION.md` instead.
 
-## Current task and immediate next task
+## Production application status and next task
 
-The ML research/model-development stage is closed and the frozen pipeline is now integrated into the FastAPI backend. The current backend exposes a health/readiness endpoint, non-sensitive model information, and a multipart SFT/PFT/CTD analysis endpoint. It validates and transiently processes uploaded audio, derives the exact frozen feature representation, returns the non-clinical screening result, and provides exact local Logistic Regression log-odds contributions without carrying participant-level TRAIN rows at runtime.
+The ML research/model-development stage is closed. The frozen pipeline is integrated into FastAPI, and the React assessment workflow is connected to the real multipart endpoint. The frontend uses a simple state machine covering landing, introduction, SFT, PFT, CTD, review, processing, and results. It displays the returned classification and score without independently redefining the threshold, presents runtime values as model log-odds contributions rather than probability changes or SHAP, and clears in-memory speech on restart.
 
-The next implementation task, only when explicitly requested, is the **React microphone assessment workflow**. Do not use the consumed TEST partition to redesign, tune, select, calibrate, or re-evaluate the model; future improvements require TRAIN-only development or, preferably, a new external validation cohort.
+Local development uses FastAPI at `http://127.0.0.1:8000` and Vite at `http://localhost:5173`. CORS is limited to the localhost/127.0.0.1 Vite origins with credentials disabled. The frontend converts browser MediaRecorder output to `audio/wav` before submission; FastAPI retains responsibility for mono/16 kHz processing. No authorized Cookie Theft stimulus image exists in the repository, so demonstrations must supply an appropriately authorized stimulus separately or configure `VITE_CTD_STIMULUS_URL` to an authorized application-served asset.
+
+The next task is **manual end-to-end demonstration validation and final project/report preparation**, only when explicitly requested. A real microphone check must use newly recorded non-PROCESS-2 speech. Do not use the consumed TEST partition to redesign, tune, select, calibrate, or re-evaluate the model; future improvements require TRAIN-only development or, preferably, a new external validation cohort.
 
 ## Explicitly do not do
 

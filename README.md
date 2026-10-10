@@ -123,7 +123,7 @@ Completed research-pipeline stages are:
 
 The current explainability fit selected `C=0.1` with five-fold TRAIN CV F1 selection (`0.650 ± 0.076` across folds). Its strongest global mean-absolute-SHAP features include PFT P-initial word count/ratio, CTD mean voice energy, SFT repeated-word count, and CTD silence ratio. The exact tables and figures are saved with the artifact outputs.
 
-The final all-TRAIN serialized pipeline, strict 51-feature schema, deployment metadata, and SHA-256 manifest are available under `artifacts/models/`. The predefined PROCESS-2 TEST partition was evaluated after the ASR configuration, feature representation, preprocessing pipeline, classifier, regularization, and operating threshold had been frozen. It is now **consumed** and must not be used for further model development or re-evaluation. The production inference / FastAPI integration is complete; the React microphone workflow remains a future stage.
+The final all-TRAIN serialized pipeline, strict 51-feature schema, deployment metadata, and SHA-256 manifest are available under `artifacts/models/`. The predefined PROCESS-2 TEST partition was evaluated after the ASR configuration, feature representation, preprocessing pipeline, classifier, regularization, and operating threshold had been frozen. It is now **consumed** and must not be used for further model development or re-evaluation. The production inference / FastAPI integration and React microphone assessment workflow are complete.
 
 The saved official record is `artifacts/results/official_test_evaluation/`; its metrics, bootstrap confidence intervals, confusion matrix, ROC curve, score-distribution plot, and descriptive diagnosis breakdown are documented in [docs/OFFICIAL_TEST_EVALUATION.md](docs/OFFICIAL_TEST_EVALUATION.md). During the first authorized evaluation, two evaluator processes inadvertently ran concurrently before atomic single-run protection was added. The finalized, internally consistent persisted bundle is the authoritative result by a procedural artifact-precedence rule—not because it was more favorable. The duplicate result is retained transparently as an execution anomaly in the evaluation note.
 
@@ -153,3 +153,47 @@ Open [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs), confirm `GET /api
 Uploads are bounded (20 MiB per recording and 180 seconds by default), decoded transiently, converted to mono/16 kHz for processing, and stored only in a server-generated temporary directory during the request. Raw audio and transcripts are not persisted or logged by default. A single local inference lock serializes ASR requests for the intended CPU-only demo hardware.
 
 The analysis response includes transient transcripts, task durations and word counts, the 0–100 display-only Cognitive Speech Screening Score, the raw classifier score, the frozen `0.53` TRAIN-derived research operating threshold, readable observed speech characteristics, and exact local Logistic Regression log-odds contributions. The explanation describes how values contributed toward the model output; it is not a causal or clinical biomarker claim.
+
+Local browser access is narrowly allowed from `http://localhost:5173` and `http://127.0.0.1:5173`. Override `SCREENING_CORS_ORIGINS` in the root `.env` only when another trusted development origin is required. Credentials are not enabled.
+
+## React assessment interface
+
+The React interface implements the complete local demonstration flow:
+
+1. Research disclaimer and service-readiness check.
+2. Assessment introduction and one reusable microphone recorder for SFT, PFT, and CTD.
+3. Recording review with playback and re-recording.
+4. Multipart submission to the real FastAPI analysis endpoint and an indeterminate CPU-processing screen.
+5. Results with the returned screening score/classification, task summaries, automatic transcripts, neutral observed speech measurements, and exact model log-odds contribution explanations.
+6. A new-assessment action that releases microphone tracks, revokes playback URLs, and clears speech data from browser memory.
+
+Install and start the frontend in a second PowerShell terminal:
+
+```powershell
+cd D:\minorProject\Project\speech-cognitive-screening\frontend
+Copy-Item .env.example .env.local
+npm install
+npm run dev
+```
+
+The default frontend URL is [http://localhost:5173](http://localhost:5173). `VITE_API_BASE_URL` in `frontend/.env.local` controls the backend URL and defaults to `http://127.0.0.1:8000`. Do not put a multipart `Content-Type` header in client code; the browser supplies the boundary.
+
+### Browser audio format and privacy
+
+`MediaRecorder` chooses the best browser-supported source type from Opus/WebM, WebM, or Ogg. Before upload, the browser decodes that in-memory recording and encodes an uncompressed 16-bit PCM WAV while preserving the captured sample rate and channel count. It applies no denoising, enhancement, trimming, resampling, or amplitude normalization. The FastAPI path remains responsible for the established mono/16 kHz processing conversion. The multipart filenames and MIME type sent to the backend are WAV-compatible (`audio/wav`).
+
+Speech blobs and playback object URLs remain in browser memory only and are not written to local storage. The backend uses request-scoped temporary files and does not persist audio or transcripts by default. Microphone access requires a supported modern browser and a secure context; `localhost` is treated as secure by current browsers.
+
+No authorized Cookie Theft stimulus image was found in the repository, so the application does not download or substitute a random image. For a supervised demonstration, the facilitator can display the authorized stimulus separately. If an appropriately licensed local/hosted asset becomes available, set `VITE_CTD_STIMULUS_URL` to its application-served URL before starting Vite.
+
+### Frontend verification
+
+```powershell
+cd D:\minorProject\Project\speech-cognitive-screening\frontend
+npm test
+npm run build
+```
+
+The automated frontend suite uses mocked microphone and API behavior only; it does not use PROCESS-2 audio. A real microphone smoke test must use newly recorded demonstration speech, never the consumed official TEST partition.
+
+Known limitations are the CPU-only ASR wait time, no real-time server progress percentages, browser-dependent support for decoding the recorder's source container, and the absence of a distributable CTD stimulus in this repository. The interface does not persist an interrupted assessment across page refreshes by design, because speech blobs are not stored in browser persistence.

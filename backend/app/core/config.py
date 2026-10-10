@@ -25,6 +25,13 @@ class Settings(BaseSettings):
     screening_max_upload_bytes: int = Field(default=20 * 1024 * 1024, gt=0)
     screening_max_duration_seconds: float = Field(default=180.0, gt=0)
     screening_target_sample_rate: int = Field(default=16_000, gt=0)
+    screening_cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
+
+    @property
+    def cors_allowed_origins(self) -> list[str]:
+        """Return the narrow local-development origins accepted by FastAPI."""
+
+        return [origin.strip() for origin in self.screening_cors_origins.split(",") if origin.strip()]
 
     def process2_dataset_exists(self) -> bool:
         """Check only whether the configured dataset directory exists."""

@@ -7,9 +7,11 @@ from collections.abc import Callable
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from .api.health import router as health_router
 from .api.screening import router as screening_router
+from .core.config import get_settings
 from .services.screening_service import ScreeningService
 
 
@@ -43,6 +45,13 @@ def create_app(
         ),
         version="0.1.0",
         lifespan=lifespan,
+    )
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=get_settings().cors_allowed_origins,
+        allow_credentials=False,
+        allow_methods=["GET", "POST", "OPTIONS"],
+        allow_headers=["Content-Type"],
     )
     app.include_router(health_router, prefix="/api")
     app.include_router(screening_router, prefix="/api/v1")
