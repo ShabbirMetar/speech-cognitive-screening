@@ -108,19 +108,19 @@ def screening_classification(
 
 def format_feature_contribution(
     feature: str,
-    shap_value: float,
+    contribution_value: float,
     observed_value: float,
     reference_median: float,
 ) -> str:
-    """Format one contribution using observed-vs-TRAIN context and SHAP direction.
+    """Format one model contribution using observed-vs-TRAIN context and its sign.
 
-    SHAP sign determines the model-output direction.  Higher/lower wording is
+    The contribution sign determines the model-output direction. Higher/lower wording is
     emitted only when a finite observed value can be compared with the TRAIN
     reference median; no clinical meaning is attached to the feature itself.
     """
 
     label = human_feature_label(feature)
-    contribution = float(shap_value)
+    contribution = float(contribution_value)
     if contribution > 0:
         destination = "possible-impairment-like screening output"
     elif contribution < 0:

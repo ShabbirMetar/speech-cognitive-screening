@@ -12,7 +12,7 @@ This repository contains a research prototype for preliminary speech-based cogni
 
 PROCESS-2 is an external controlled-access research dataset. It remains outside this Git repository and must never be committed, copied, uploaded, or placed in the application source tree. Configure its local location through `PROCESS2_DATASET_PATH` in a local `.env` file based on `.env.example`.
 
-The application reads the local dataset location from `PROCESS2_DATASET_PATH`. Dataset files remain read-only and external to this repository. Metadata validation and descriptive EDA read the CSV without changing it. Any approved audio or transcript processing is read-only and writes only derived local artifacts inside this repository; raw dataset files are never copied or altered.
+Development and research scripts read the local dataset location from `PROCESS2_DATASET_PATH`. Dataset files remain read-only and external to this repository. The production FastAPI inference path does **not** read PROCESS-2 files, training feature tables, or held-out TEST outputs; it uses only uploaded audio, the frozen model artifacts, and the frozen ASR configuration.
 
 ## Local environment
 
@@ -123,7 +123,7 @@ Completed research-pipeline stages are:
 
 The current explainability fit selected `C=0.1` with five-fold TRAIN CV F1 selection (`0.650 ± 0.076` across folds). Its strongest global mean-absolute-SHAP features include PFT P-initial word count/ratio, CTD mean voice energy, SFT repeated-word count, and CTD silence ratio. The exact tables and figures are saved with the artifact outputs.
 
-The final all-TRAIN serialized pipeline, strict 51-feature schema, deployment metadata, and SHA-256 manifest are available under `artifacts/models/`. The predefined PROCESS-2 TEST partition was evaluated after the ASR configuration, feature representation, preprocessing pipeline, classifier, regularization, and operating threshold had been frozen. It is now **consumed** and must not be used for further model development or re-evaluation. The next stage is production inference / FastAPI integration; the React microphone workflow remains a future stage.
+The final all-TRAIN serialized pipeline, strict 51-feature schema, deployment metadata, and SHA-256 manifest are available under `artifacts/models/`. The predefined PROCESS-2 TEST partition was evaluated after the ASR configuration, feature representation, preprocessing pipeline, classifier, regularization, and operating threshold had been frozen. It is now **consumed** and must not be used for further model development or re-evaluation. The production inference / FastAPI integration is complete; the React microphone workflow remains a future stage.
 
 The saved official record is `artifacts/results/official_test_evaluation/`; its metrics, bootstrap confidence intervals, confusion matrix, ROC curve, score-distribution plot, and descriptive diagnosis breakdown are documented in [docs/OFFICIAL_TEST_EVALUATION.md](docs/OFFICIAL_TEST_EVALUATION.md). During the first authorized evaluation, two evaluator processes inadvertently ran concurrently before atomic single-run protection was added. The finalized, internally consistent persisted bundle is the authoritative result by a procedural artifact-precedence rule—not because it was more favorable. The duplicate result is retained transparently as an execution anomaly in the evaluation note.
 
@@ -135,3 +135,21 @@ cd D:\minorProject\Project\speech-cognitive-screening
 ```
 
 The display-only Cognitive Speech Screening Score is `raw classifier score × 100`. It is not a probability of dementia, disease, or clinical risk percentage. At the TRAIN-derived research operating point, a raw score of at least `0.53` maps to “Possible impairment-like speech pattern”; lower scores map to “Healthy-like speech pattern.”
+
+## Production FastAPI inference
+
+The backend loads the serialized pipeline, feature schema, metadata, manifest, and one frozen faster-whisper `base.en` CPU model during application startup. SHA-256 manifest validation must pass before the screening runtime reports ready. It never fits the imputer, scaler, or classifier during a request.
+
+Start the local API from the repository root:
+
+```powershell
+cd D:\minorProject\Project\speech-cognitive-screening
+.\.venv\Scripts\Activate.ps1
+uvicorn backend.app.main:app --reload
+```
+
+Open [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs), confirm `GET /api/health` reports `screening_model_ready: true`, then use `POST /api/v1/screening/analyze` with multipart WAV uploads named `sft_audio`, `pft_audio`, and `ctd_audio`. `GET /api/v1/screening/model-info` exposes only non-sensitive frozen configuration metadata.
+
+Uploads are bounded (20 MiB per recording and 180 seconds by default), decoded transiently, converted to mono/16 kHz for processing, and stored only in a server-generated temporary directory during the request. Raw audio and transcripts are not persisted or logged by default. A single local inference lock serializes ASR requests for the intended CPU-only demo hardware.
+
+The analysis response includes transient transcripts, task durations and word counts, the 0–100 display-only Cognitive Speech Screening Score, the raw classifier score, the frozen `0.53` TRAIN-derived research operating threshold, readable observed speech characteristics, and exact local Logistic Regression log-odds contributions. The explanation describes how values contributed toward the model output; it is not a causal or clinical biomarker claim.

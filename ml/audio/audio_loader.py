@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
+import librosa
 import numpy as np
 import soundfile as sf
 
@@ -61,4 +62,35 @@ def load_wav_read_only(path: Path) -> AudioData:
         waveform=np.asarray(waveform, dtype=np.float32),
         sample_rate=int(sample_rate),
         channel_count=channel_count,
+    )
+
+
+def load_and_normalize_audio(path: Path, target_sample_rate: int = 16_000) -> AudioData:
+    """Decode audio, average channels, and resample only in memory for runtime use.
+
+    The source file is never altered.  No denoising, gain adjustment, or other
+    speech enhancement is applied; only mono conversion and the runtime's
+    required sample-rate conversion are performed.
+    """
+
+    if not isinstance(target_sample_rate, (int, np.integer)) or target_sample_rate <= 0:
+        raise AudioValidationError(f"Invalid target audio sample rate: {target_sample_rate!r}")
+    decoded = load_wav_read_only(path)
+    waveform = decoded.waveform
+    if decoded.sample_rate != int(target_sample_rate):
+        try:
+            waveform = librosa.resample(
+                waveform,
+                orig_sr=decoded.sample_rate,
+                target_sr=int(target_sample_rate),
+                res_type="kaiser_best",
+            )
+        except Exception as error:
+            raise AudioValidationError("Audio sample-rate conversion failed.") from error
+    normalized = np.asarray(waveform, dtype=np.float32)
+    validate_waveform(normalized, int(target_sample_rate))
+    return AudioData(
+        waveform=normalized,
+        sample_rate=int(target_sample_rate),
+        channel_count=decoded.channel_count,
     )

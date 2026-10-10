@@ -37,6 +37,7 @@ Development code must call `ml.data.development_guard.assert_train_only`; it mus
 9. TRAIN-only calibration, threshold, and explainability analysis completed. No TEST rows were loaded, transcribed, or evaluated during development.
 10. Final all-TRAIN Logistic Regression pipeline fitted once and frozen with its exact 51-feature schema, model metadata, ASR configuration reference, and SHA-256 integrity manifest. No TEST rows were used to fit or alter it.
 11. One-time official held-out TEST evaluation completed with the frozen pipeline. The authoritative persisted output bundle contains 80 participant predictions and 240 frozen-ASR recordings; no TEST-based fitting, tuning, calibration, feature selection, threshold selection, or model modification occurred.
+12. Production FastAPI inference integration completed without PROCESS-2 runtime dependency. It loads and hash-validates the frozen artifacts at startup, initializes one frozen faster-whisper `base.en` CPU model, accepts transient SFT/PFT/CTD uploads, reuses the frozen 51-feature assembly, and performs inference only.
 
 ## Frozen decisions
 
@@ -49,6 +50,7 @@ Development code must call `ml.data.development_guard.assert_train_only`; it mus
 - Keep age, gender, and MMSE out of the primary predictive model.
 - Handle missing Honoré statistics with fold-local median imputation; do not drop them without a separately specified ablation.
 - Use interpretable/regularized models before complex models. The final all-TRAIN serialized artifact is frozen at model version `1.0.0`: median imputer, StandardScaler, and Logistic Regression `C=0.1`, `max_iter=2000`, `random_state=42`.
+- Production runtime: load `artifacts/models/` once at FastAPI startup and reject a non-matching SHA-256 manifest. Reuse one faster-whisper `base.en` CPU/int8 model with a single-ASR-request lock. Runtime requests never fit the pipeline and must not read PROCESS-2, TRAIN feature files, locked TEST files, or official evaluation outputs.
 
 ## Current artifacts
 
@@ -62,6 +64,7 @@ Development code must call `ml.data.development_guard.assert_train_only`; it mus
 - Explainability outputs: `artifacts/results/explainability/` — global SHAP/standardized-coefficient tables, feature-group reliance, deterministic TRAIN-only example explanations, figures, and provenance metadata.
 - Frozen inference artifacts: `artifacts/models/cognitive_screening_pipeline.joblib`, `artifacts/models/feature_schema.json`, `artifacts/models/model_metadata.json`, and `artifacts/models/model_manifest.json`. The manifest validates SHA-256 hashes for the pipeline, schema, metadata, and the existing frozen TRAIN ASR configuration.
 - Authoritative official TEST record: `artifacts/results/official_test_evaluation/` — persisted predictions, fixed-threshold metrics, 2,000-replicate descriptive bootstrap confidence intervals, descriptive diagnosis breakdown, metadata, and plots. Inspect these files directly; do **not** rerun the evaluator after TEST consumption.
+- FastAPI inference: `backend/app/services/screening_service.py`, `backend/app/api/screening.py`, and `backend/app/api/schemas.py`. Endpoints are `GET /api/health`, `GET /api/v1/screening/model-info`, and `POST /api/v1/screening/analyze` with `sft_audio`, `pft_audio`, and `ctd_audio` multipart fields. User audio/transcripts are temporary by default.
 
 ## Actual observed metrics
 
@@ -174,7 +177,9 @@ During the first authorized held-out evaluation, two evaluator processes were in
 
 ## Current task and immediate next task
 
-The ML research/model-development stage is closed. The next task is **production inference / FastAPI integration** using the already-frozen pipeline and schema. The React microphone workflow can follow that integration. Do not use the consumed TEST partition to redesign, tune, select, calibrate, or re-evaluate the model; future improvements require TRAIN-only development or, preferably, a new external validation cohort.
+The ML research/model-development stage is closed and the frozen pipeline is now integrated into the FastAPI backend. The current backend exposes a health/readiness endpoint, non-sensitive model information, and a multipart SFT/PFT/CTD analysis endpoint. It validates and transiently processes uploaded audio, derives the exact frozen feature representation, returns the non-clinical screening result, and provides exact local Logistic Regression log-odds contributions without carrying participant-level TRAIN rows at runtime.
+
+The next implementation task, only when explicitly requested, is the **React microphone assessment workflow**. Do not use the consumed TEST partition to redesign, tune, select, calibrate, or re-evaluate the model; future improvements require TRAIN-only development or, preferably, a new external validation cohort.
 
 ## Explicitly do not do
 

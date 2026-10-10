@@ -48,6 +48,25 @@ class FrozenScreeningArtifacts:
     model_directory: Path
 
 
+@dataclass(frozen=True)
+class LinearModelAttributions:
+    """Exact additive linear-model contributions for schema-validated rows.
+
+    Contributions are on the classifier decision-function (log-odds) scale
+    relative to the zero-centred, TRAIN-fitted standardized representation.
+    They are suitable for a runtime explanation without storing participant
+    training rows or recomputing global SHAP values.
+    """
+
+    feature_names: tuple[str, ...]
+    observed_values: np.ndarray
+    imputed_values: np.ndarray
+    train_standardization_means: np.ndarray
+    log_odds_contributions: np.ndarray
+    base_log_odds: float
+    decision_log_odds: np.ndarray
+
+
 def sha256_file(path: Path) -> str:
     """Return the SHA-256 digest for one artifact file."""
 
@@ -189,6 +208,46 @@ def transform_frozen_features(
     imputer = artifacts.pipeline.named_steps["imputer"]
     scaler = artifacts.pipeline.named_steps["scaler"]
     return scaler.transform(imputer.transform(ordered))
+
+
+def linear_model_attributions(
+    feature_table: pd.DataFrame, artifacts: FrozenScreeningArtifacts
+) -> LinearModelAttributions:
+    """Return exact local linear contributions without fitting or TRAIN-row access.
+
+    For the frozen Logistic Regression model, the standardized TRAIN reference
+    has zero-valued coordinates.  Therefore ``coefficient * standardized
+    value`` is the exact additive contribution for each feature relative to
+    that reference, and the intercept is the base log-odds value.  This is a
+    linear, interventional SHAP-equivalent decomposition, but is intentionally
+    named as a log-odds attribution so API consumers do not mistake it for a
+    probability change or correlation-conditional SHAP analysis.
+    """
+
+    ordered = validate_and_order_features(feature_table, artifacts.schema)
+    imputer = artifacts.pipeline.named_steps["imputer"]
+    scaler = artifacts.pipeline.named_steps["scaler"]
+    classifier = artifacts.pipeline.named_steps["classifier"]
+    imputed = imputer.transform(ordered)
+    transformed = scaler.transform(imputed)
+    coefficients = np.asarray(classifier.coef_, dtype=float).reshape(-1)
+    if coefficients.size != transformed.shape[1]:
+        raise ValueError("Frozen classifier coefficients do not match transformed features.")
+    contributions = transformed * coefficients
+    base = float(np.asarray(classifier.intercept_, dtype=float).reshape(-1)[0])
+    decision = np.asarray(classifier.decision_function(transformed), dtype=float).reshape(-1)
+    reconstructed = base + contributions.sum(axis=1)
+    if not np.allclose(decision, reconstructed, rtol=1e-10, atol=1e-10):
+        raise ValueError("Linear attribution reconstruction does not match the frozen model output.")
+    return LinearModelAttributions(
+        feature_names=tuple(ordered.columns),
+        observed_values=ordered.to_numpy(dtype=float),
+        imputed_values=np.asarray(imputed, dtype=float),
+        train_standardization_means=np.asarray(scaler.mean_, dtype=float),
+        log_odds_contributions=np.asarray(contributions, dtype=float),
+        base_log_odds=base,
+        decision_log_odds=decision,
+    )
 
 
 def predict_screening(

@@ -19,6 +19,7 @@ from ml.models.explainability import RESEARCH_OPERATING_THRESHOLD, screening_cla
 from ml.models.frozen_pipeline import (
     DEFAULT_MODEL_DIRECTORY,
     MANIFEST_FILENAME,
+    linear_model_attributions,
     load_frozen_artifacts,
     predict_screening,
     validate_and_order_features,
@@ -84,3 +85,10 @@ def test_scores_boundary_and_manifest_integrity(artifacts, one_feature_row) -> N
     invalid_manifest["artifact_sha256"]["feature_schema.json"] = "0" * 64
     with pytest.raises(ValueError, match="SHA-256 mismatch"):
         validate_manifest(artifacts.model_directory, invalid_manifest)
+
+
+def test_linear_runtime_attributions_reconstruct_the_frozen_log_odds(artifacts, one_feature_row) -> None:
+    attribution = linear_model_attributions(one_feature_row, artifacts)
+    reconstructed = attribution.base_log_odds + attribution.log_odds_contributions.sum(axis=1)
+    assert attribution.log_odds_contributions.shape == (1, 51)
+    assert np.allclose(reconstructed, attribution.decision_log_odds, rtol=1e-10, atol=1e-10)
