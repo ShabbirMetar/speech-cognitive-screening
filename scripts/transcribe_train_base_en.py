@@ -109,23 +109,36 @@ def write_or_validate_frozen_config(config_path: Path, config: WhisperTranscript
     _atomic_json_write(expected, config_path)
 
 
-def build_train_worklist(train_table: pd.DataFrame) -> pd.DataFrame:
-    """Create exactly one required base.en transcription item per TRAIN participant/task."""
+def build_split_worklist(feature_table: pd.DataFrame, expected_split: str) -> pd.DataFrame:
+    """Create exactly one required base.en item per participant in one strict split."""
 
-    train = assert_train_only(train_table)
-    if train["participant_id"].duplicated().any():
-        raise ValueError("TRAIN feature table contains duplicate participant IDs.")
+    if {"participant_id", "Split"}.difference(feature_table.columns):
+        raise ValueError("Feature table is missing participant_id or Split for ASR worklist creation.")
+    normalized_expected = expected_split.strip().upper()
+    observed = feature_table["Split"].astype("string").str.strip().str.upper()
+    if not observed.eq(normalized_expected).all():
+        found = sorted(observed.dropna().unique().tolist())
+        raise ValueError(f"ASR worklist requires only Split == {normalized_expected}; found {found}.")
+    if feature_table["participant_id"].duplicated().any():
+        raise ValueError("ASR feature table contains duplicate participant IDs.")
     return pd.DataFrame(
         [
             {"participant_id": participant_id, "task": task}
-            for participant_id in train["participant_id"]
+            for participant_id in feature_table["participant_id"]
             for task in TASKS
         ]
     )
 
 
+def build_train_worklist(train_table: pd.DataFrame) -> pd.DataFrame:
+    """Create exactly one required base.en transcription item per TRAIN participant/task."""
+
+    train = assert_train_only(train_table)
+    return build_split_worklist(train, "TRAIN")
+
+
 def validate_transcript_frame(frame: pd.DataFrame, worklist: pd.DataFrame) -> None:
-    """Validate checkpoint/final rows as a subset of the frozen TRAIN worklist."""
+    """Validate checkpoint/final rows as a subset of one frozen split worklist."""
 
     missing = set(TRANSCRIPT_COLUMNS).difference(frame.columns)
     if missing:
@@ -137,7 +150,7 @@ def validate_transcript_frame(frame: pd.DataFrame, worklist: pd.DataFrame) -> No
     expected = set(map(tuple, worklist[["participant_id", "task"]].to_records(index=False)))
     actual = set(map(tuple, frame[["participant_id", "task"]].to_records(index=False)))
     if not actual.issubset(expected):
-        raise ValueError("ASR transcript checkpoint contains non-TRAIN or unknown participant/task rows.")
+        raise ValueError("ASR transcript checkpoint contains unknown participant/task rows.")
 
 
 def load_checkpoint(checkpoint_path: Path, worklist: pd.DataFrame) -> pd.DataFrame:

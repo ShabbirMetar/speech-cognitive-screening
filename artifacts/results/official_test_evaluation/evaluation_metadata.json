@@ -1,0 +1,52 @@
+{
+  "bootstrap": {
+    "purpose": "descriptive uncertainty estimation only; no retraining, tuning, or threshold selection",
+    "random_state": 42,
+    "replicates": 2000
+  },
+  "class_counts": {
+    "Healthy": 40,
+    "Impaired": 40
+  },
+  "diagnosis_counts": {
+    "Dementia": 10,
+    "HC": 40,
+    "MCI": 30
+  },
+  "evaluated_at_utc": "2026-10-10T10:23:33.065610+00:00",
+  "evaluation_type": "ONE-TIME OFFICIAL HELD-OUT TEST EVALUATION",
+  "frozen_artifact_sha256": {
+    "D:\\minorProject\\Project\\speech-cognitive-screening\\artifacts\\transcripts\\asr_train\\asr_config.json": "389757793b826269c89805de2a5a30c682d2e6d3dd0a2af0de802eca589d6bec",
+    "cognitive_screening_pipeline.joblib": "41a7051c1576637bd80683070052f52268bd2d41131fc49392586ff19e845e36",
+    "feature_schema.json": "4fabe9c3a06207d27ee67bfeba68cc7f422cd3df0702d4194d15188eb30cca86",
+    "model_metadata.json": "c7655e5ea78f870aafca46aa9fcd8eb76f486632291b5c84b7a37634b6908316"
+  },
+  "frozen_model": {
+    "asr_configuration": {
+      "compute_type": "int8",
+      "cpu_threads": 4,
+      "device": "cpu",
+      "extractor": "faster-whisper",
+      "language": "en",
+      "model_size": "base.en",
+      "num_workers": 1,
+      "pipeline_version": 1
+    },
+    "calibration": "raw Logistic Regression score; no additional sigmoid calibration",
+    "feature_count": 51,
+    "feature_representation": "ASR_RATE_PLUS_CTD",
+    "logistic_C": 0.1,
+    "preprocessing": [
+      "SimpleImputer(strategy=median)",
+      "StandardScaler"
+    ],
+    "research_threshold": 0.53,
+    "score_source": "raw Logistic Regression impaired-class classifier score"
+  },
+  "git_commit": "070a4cf5c22f33aea54f2f44a9f7f9f795c349f5",
+  "no_fitting_or_tuning_performed_on_test": true,
+  "participant_count": 80,
+  "recording_count": 240,
+  "test_status": "CONSUMED FOR FINAL EVALUATION",
+  "threshold_was_not_modified_from_test_results": true
+}

@@ -1,0 +1,2 @@
+accuracy,balanced_accuracy,precision,sensitivity,specificity,f1,roc_auc,brier_score,log_loss,tn,fp,fn,tp
+0.8,0.8,0.8157894736842105,0.775,0.825,0.7948717948717948,0.825,0.1738595267636017,0.5531966435855519,33,7,9,31

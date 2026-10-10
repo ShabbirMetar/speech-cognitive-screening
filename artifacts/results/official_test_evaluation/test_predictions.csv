@@ -1,0 +1,81 @@
+participant_id,true_binary_label,original_diagnosis,raw_model_score,screening_score,predicted_binary_label,predicted_screening_class
+PROCESS-2_rec__321,0,HC,0.2117087525019856,21.17087525019856,0,Healthy-like speech pattern
+PROCESS-2_rec__322,0,HC,0.34529433639581,34.529433639581,0,Healthy-like speech pattern
+PROCESS-2_rec__323,0,HC,0.36952637066313176,36.95263706631317,0,Healthy-like speech pattern
+PROCESS-2_rec__324,0,HC,0.41540334242149285,41.540334242149285,0,Healthy-like speech pattern
+PROCESS-2_rec__325,0,HC,0.24373091215610246,24.373091215610245,0,Healthy-like speech pattern
+PROCESS-2_rec__326,1,MCI,0.7597740327403707,75.97740327403707,1,Possible impairment-like speech pattern
+PROCESS-2_rec__327,0,HC,0.4246969927802598,42.46969927802598,0,Healthy-like speech pattern
+PROCESS-2_rec__328,0,HC,0.3782659640612156,37.82659640612156,0,Healthy-like speech pattern
+PROCESS-2_rec__329,1,MCI,0.9642878859953838,96.42878859953838,1,Possible impairment-like speech pattern
+PROCESS-2_rec__330,0,HC,0.30089212115360425,30.089212115360425,0,Healthy-like speech pattern
+PROCESS-2_rec__331,0,HC,0.9357565438801847,93.57565438801846,1,Possible impairment-like speech pattern
+PROCESS-2_rec__332,1,MCI,0.927215181540896,92.7215181540896,1,Possible impairment-like speech pattern
+PROCESS-2_rec__333,0,HC,0.2879575832872495,28.79575832872495,0,Healthy-like speech pattern
+PROCESS-2_rec__334,1,MCI,0.9294940619364994,92.94940619364993,1,Possible impairment-like speech pattern
+PROCESS-2_rec__335,1,Dementia,0.9003081802795277,90.03081802795278,1,Possible impairment-like speech pattern
+PROCESS-2_rec__336,1,MCI,0.7957653210143711,79.57653210143711,1,Possible impairment-like speech pattern
+PROCESS-2_rec__337,1,MCI,0.6594823680920333,65.94823680920334,1,Possible impairment-like speech pattern
+PROCESS-2_rec__338,1,Dementia,0.8933513313523441,89.33513313523441,1,Possible impairment-like speech pattern
+PROCESS-2_rec__339,0,HC,0.7575689917018513,75.75689917018514,1,Possible impairment-like speech pattern
+PROCESS-2_rec__340,0,HC,0.5848688719784239,58.486887197842385,1,Possible impairment-like speech pattern
+PROCESS-2_rec__341,1,MCI,0.9793376544152169,97.93376544152169,1,Possible impairment-like speech pattern
+PROCESS-2_rec__342,0,HC,0.31515298622294996,31.515298622294996,0,Healthy-like speech pattern
+PROCESS-2_rec__343,0,HC,0.4758063880038924,47.58063880038924,0,Healthy-like speech pattern
+PROCESS-2_rec__344,1,MCI,0.843172345649265,84.31723456492651,1,Possible impairment-like speech pattern
+PROCESS-2_rec__345,0,HC,0.18515939536183457,18.515939536183456,0,Healthy-like speech pattern
+PROCESS-2_rec__346,1,MCI,0.25763827670593503,25.763827670593503,0,Healthy-like speech pattern
+PROCESS-2_rec__347,0,HC,0.29644807277792967,29.644807277792967,0,Healthy-like speech pattern
+PROCESS-2_rec__348,0,HC,0.24417706234757866,24.417706234757866,0,Healthy-like speech pattern
+PROCESS-2_rec__349,0,HC,0.4726660953858261,47.26660953858261,0,Healthy-like speech pattern
+PROCESS-2_rec__350,0,HC,0.10466516964066215,10.466516964066216,0,Healthy-like speech pattern
+PROCESS-2_rec__351,1,MCI,0.8275921461444464,82.75921461444464,1,Possible impairment-like speech pattern
+PROCESS-2_rec__352,1,MCI,0.9074183841632122,90.74183841632122,1,Possible impairment-like speech pattern
+PROCESS-2_rec__353,1,MCI,0.2713369671814225,27.133696718142247,0,Healthy-like speech pattern
+PROCESS-2_rec__354,0,HC,0.4753875994480241,47.53875994480241,0,Healthy-like speech pattern
+PROCESS-2_rec__355,1,MCI,0.8283191970907315,82.83191970907315,1,Possible impairment-like speech pattern
+PROCESS-2_rec__356,1,Dementia,0.7440201839197448,74.40201839197448,1,Possible impairment-like speech pattern
+PROCESS-2_rec__357,1,MCI,0.569264959852984,56.926495985298395,1,Possible impairment-like speech pattern
+PROCESS-2_rec__358,1,MCI,0.5320509815498217,53.20509815498217,1,Possible impairment-like speech pattern
+PROCESS-2_rec__359,0,HC,0.3150052395764801,31.500523957648007,0,Healthy-like speech pattern
+PROCESS-2_rec__360,0,HC,0.2829588370216705,28.295883702167053,0,Healthy-like speech pattern
+PROCESS-2_rec__361,0,HC,0.715721411559772,71.57214115597719,1,Possible impairment-like speech pattern
+PROCESS-2_rec__362,0,HC,0.28887633117126527,28.887633117126526,0,Healthy-like speech pattern
+PROCESS-2_rec__363,1,Dementia,0.6143026450085194,61.43026450085194,1,Possible impairment-like speech pattern
+PROCESS-2_rec__364,0,HC,0.22970314288301985,22.970314288301985,0,Healthy-like speech pattern
+PROCESS-2_rec__365,1,MCI,0.48433770265719,48.433770265719,0,Healthy-like speech pattern
+PROCESS-2_rec__366,1,Dementia,0.9690669172625883,96.90669172625883,1,Possible impairment-like speech pattern
+PROCESS-2_rec__367,0,HC,0.13644888904034938,13.644888904034937,0,Healthy-like speech pattern
+PROCESS-2_rec__368,1,MCI,0.7943940732953754,79.43940732953753,1,Possible impairment-like speech pattern
+PROCESS-2_rec__369,1,MCI,0.6639446610457604,66.39446610457604,1,Possible impairment-like speech pattern
+PROCESS-2_rec__370,0,HC,0.5086090935083614,50.86090935083614,0,Healthy-like speech pattern
+PROCESS-2_rec__371,1,MCI,0.44720066306666506,44.7200663066665,0,Healthy-like speech pattern
+PROCESS-2_rec__372,1,Dementia,0.4688588621247319,46.88588621247319,0,Healthy-like speech pattern
+PROCESS-2_rec__373,1,MCI,0.8532003850671315,85.32003850671315,1,Possible impairment-like speech pattern
+PROCESS-2_rec__374,1,MCI,0.8725330651302557,87.25330651302558,1,Possible impairment-like speech pattern
+PROCESS-2_rec__375,0,HC,0.2508966773547829,25.089667735478287,0,Healthy-like speech pattern
+PROCESS-2_rec__376,0,HC,0.244840916172168,24.484091617216798,0,Healthy-like speech pattern
+PROCESS-2_rec__377,1,MCI,0.6324368698464228,63.24368698464228,1,Possible impairment-like speech pattern
+PROCESS-2_rec__378,1,Dementia,0.7777817049185053,77.77817049185053,1,Possible impairment-like speech pattern
+PROCESS-2_rec__379,0,HC,0.27103998395495255,27.103998395495253,0,Healthy-like speech pattern
+PROCESS-2_rec__380,1,MCI,0.8971375097555508,89.71375097555509,1,Possible impairment-like speech pattern
+PROCESS-2_rec__381,0,HC,0.3824543119611996,38.24543119611996,0,Healthy-like speech pattern
+PROCESS-2_rec__382,1,MCI,0.9623110920148448,96.23110920148447,1,Possible impairment-like speech pattern
+PROCESS-2_rec__383,0,HC,0.13076439666111306,13.076439666111305,0,Healthy-like speech pattern
+PROCESS-2_rec__384,0,HC,0.8709752700244954,87.09752700244954,1,Possible impairment-like speech pattern
+PROCESS-2_rec__385,1,Dementia,0.8441584173611542,84.41584173611541,1,Possible impairment-like speech pattern
+PROCESS-2_rec__386,1,MCI,0.691348484087748,69.1348484087748,1,Possible impairment-like speech pattern
+PROCESS-2_rec__387,0,HC,0.23285122323330104,23.285122323330103,0,Healthy-like speech pattern
+PROCESS-2_rec__388,1,Dementia,0.0132122404283545,1.32122404283545,0,Healthy-like speech pattern
+PROCESS-2_rec__389,1,MCI,0.8578702060683142,85.78702060683142,1,Possible impairment-like speech pattern
+PROCESS-2_rec__390,1,MCI,0.9070161697664801,90.70161697664801,1,Possible impairment-like speech pattern
+PROCESS-2_rec__391,0,HC,0.5137855565988355,51.37855565988355,0,Healthy-like speech pattern
+PROCESS-2_rec__392,1,MCI,0.273546271396592,27.3546271396592,0,Healthy-like speech pattern
+PROCESS-2_rec__393,1,MCI,0.3154925873232609,31.54925873232609,0,Healthy-like speech pattern
+PROCESS-2_rec__394,0,HC,0.3177123970419431,31.771239704194308,0,Healthy-like speech pattern
+PROCESS-2_rec__395,0,HC,0.499256934299382,49.9256934299382,0,Healthy-like speech pattern
+PROCESS-2_rec__396,0,HC,0.43414340307036753,43.41434030703675,0,Healthy-like speech pattern
+PROCESS-2_rec__397,0,HC,0.8803885210437834,88.03885210437834,1,Possible impairment-like speech pattern
+PROCESS-2_rec__398,1,MCI,0.5103489514257035,51.03489514257035,0,Healthy-like speech pattern
+PROCESS-2_rec__399,0,HC,0.7868117802401962,78.68117802401962,1,Possible impairment-like speech pattern
+PROCESS-2_rec__400,1,Dementia,0.9644009515216422,96.44009515216422,1,Possible impairment-like speech pattern

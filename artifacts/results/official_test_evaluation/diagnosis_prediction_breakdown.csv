@@ -1,0 +1,4 @@
+original_diagnosis,participant_count,predicted_healthy_like,predicted_possible_impairment_like
+HC,40,33,7
+MCI,30,7,23
+Dementia,10,2,8

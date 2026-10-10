@@ -49,7 +49,7 @@ def extract_asr_linguistic_features(transcript_text: str, task: str) -> dict[str
 
 
 def validate_asr_transcripts(transcripts: pd.DataFrame, participant_ids: Iterable[object]) -> None:
-    """Require a complete, unique TRAIN participant/task ASR transcription set."""
+    """Require a complete, unique participant/task ASR transcription set."""
 
     required = {"participant_id", "task", "transcript_text", "model"}
     missing = required.difference(transcripts.columns)
@@ -60,7 +60,7 @@ def validate_asr_transcripts(transcripts: pd.DataFrame, participant_ids: Iterabl
     expected_keys = {(str(participant_id), task) for participant_id in participant_ids for task in TASKS}
     actual_keys = {(str(row.participant_id), str(row.task).upper()) for row in transcripts.itertuples()}
     if actual_keys != expected_keys:
-        raise ValueError("ASR transcripts do not contain exactly one SFT/PFT/CTD row per TRAIN participant.")
+        raise ValueError("ASR transcripts do not contain exactly one SFT/PFT/CTD row per participant.")
 
 
 def _pivot_task_features(per_recording: pd.DataFrame, metadata: pd.DataFrame) -> pd.DataFrame:
@@ -83,24 +83,42 @@ def _pivot_task_features(per_recording: pd.DataFrame, metadata: pd.DataFrame) ->
     return metadata.set_index("participant_id").join(pivoted, how="left").reset_index()
 
 
-def build_asr_feature_tables(
+def _require_expected_split(feature_table: pd.DataFrame, expected_split: str, table_name: str) -> pd.DataFrame:
+    """Reject mixed/wrong partitions before a deterministic feature build."""
+
+    required = set(BOOKKEEPING_COLUMNS)
+    missing = required.difference(feature_table.columns)
+    if missing:
+        raise ValueError(f"{table_name} is missing required bookkeeping columns: {sorted(missing)}")
+    if feature_table["participant_id"].duplicated().any():
+        raise ValueError(f"{table_name} contains duplicate participant IDs.")
+    normalized_expected = expected_split.strip().upper()
+    observed = feature_table["Split"].astype("string").str.strip().str.upper()
+    if not observed.eq(normalized_expected).all():
+        found = sorted(observed.dropna().unique().tolist())
+        raise ValueError(f"{table_name} must contain only Split == {normalized_expected}; found {found}.")
+    return feature_table
+
+
+def build_asr_feature_tables_for_split(
     transcripts: pd.DataFrame,
-    train_metadata: pd.DataFrame,
-    acoustic_train: pd.DataFrame,
+    metadata_table: pd.DataFrame,
+    acoustic_table: pd.DataFrame,
+    expected_split: str,
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    """Build ASR-only and deployment-aligned TRAIN tables from complete ASR results.
+    """Build deterministic ASR/deployment features for one explicitly named split.
 
     The combined deployment table has ASR linguistic features, the established
     pure acoustic subset, and new ASR-count-derived rates. Existing manual
-    transcript rates in ``acoustic_train`` are intentionally not carried over.
+    transcript rates in ``acoustic_table`` are intentionally not carried over.
     """
 
-    metadata = assert_train_only(train_metadata)
-    acoustic = assert_train_only(acoustic_train)
+    metadata = _require_expected_split(metadata_table, expected_split, "metadata")
+    acoustic = _require_expected_split(acoustic_table, expected_split, "acoustic features")
     if metadata["participant_id"].duplicated().any() or acoustic["participant_id"].duplicated().any():
-        raise ValueError("TRAIN metadata/acoustic tables must have unique participant IDs.")
+        raise ValueError("Metadata/acoustic tables must have unique participant IDs.")
     if set(metadata["participant_id"]) != set(acoustic["participant_id"]):
-        raise ValueError("TRAIN metadata and acoustic participant IDs do not match.")
+        raise ValueError("Metadata and acoustic participant IDs do not match.")
     validate_asr_transcripts(transcripts, metadata["participant_id"])
 
     transcript_frame = transcripts.copy()
@@ -147,8 +165,20 @@ def build_asr_feature_tables(
         .reset_index()
     )
     if len(deployment) != len(metadata) or deployment["participant_id"].duplicated().any():
-        raise AssertionError("Deployment feature table must yield one unique row per TRAIN participant.")
+        raise AssertionError("Deployment feature table must yield one unique row per participant.")
     return asr_linguistic, deployment, per_recording.reset_index()
+
+
+def build_asr_feature_tables(
+    transcripts: pd.DataFrame,
+    train_metadata: pd.DataFrame,
+    acoustic_train: pd.DataFrame,
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Build ASR-only and deployment-aligned TRAIN tables from complete ASR results."""
+
+    metadata = assert_train_only(train_metadata)
+    acoustic = assert_train_only(acoustic_train)
+    return build_asr_feature_tables_for_split(transcripts, metadata, acoustic, "TRAIN")
 
 
 def feature_quality_report(feature_table: pd.DataFrame, feature_columns: Iterable[str]) -> pd.DataFrame:
