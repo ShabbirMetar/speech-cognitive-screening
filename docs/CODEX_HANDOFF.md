@@ -14,9 +14,9 @@ Develop a research/screening prototype that analyzes recorded speech for possibl
 
 ## No-leakage policy
 
-Feature extraction was applied deterministically and uniformly to all PROCESS-2 samples before model fitting. Feature selection, preprocessing, cross-validation, tuning, model/representation comparison, and threshold selection must use only the predefined TRAIN partition. The TEST feature rows are isolated for one final evaluation after the complete pipeline and threshold are frozen.
+Feature extraction was applied deterministically and uniformly to all PROCESS-2 samples before model fitting. Feature selection, preprocessing, cross-validation, tuning, model/representation comparison, and threshold selection used only the predefined TRAIN partition. The TEST feature rows were used once for the final held-out evaluation after the complete pipeline and threshold were frozen.
 
-Development code must call `ml.data.development_guard.assert_train_only`; it must fail if a TEST or mixed-split table reaches modelling. Do not load `*_TEST_LOCKED.csv` for development work. Do not transcribe or evaluate TEST now.
+Development code must call `ml.data.development_guard.assert_train_only`; it must fail if a TEST or mixed-split table reaches modelling. **OFFICIAL TEST STATUS: CONSUMED FOR FINAL EVALUATION.** Do not load `*_TEST_LOCKED.csv` for development work, rerun TEST ASR, rerun `scripts/evaluate_official_test.py`, or use this partition for further iterative development.
 
 ## Environment
 
@@ -34,8 +34,9 @@ Development code must call `ml.data.development_guard.assert_train_only`; it mus
 6. Full TRAIN-only `base.en` transcription: 960/960 successful, 0 failed. Outputs include ASR transcripts, ASR linguistic features, and deployment features.
 7. TRAIN-only deployment representation comparison completed on 2026-10-02.
 8. Focused TRAIN-only fusion strategy comparison and freeze of the 51-feature `ASR_RATE_PLUS_CTD` representation.
-9. TRAIN-only calibration, threshold, and explainability analysis completed. No TEST rows were loaded, transcribed, or evaluated.
-10. Final all-TRAIN Logistic Regression pipeline fitted once and frozen with its exact 51-feature schema, model metadata, ASR configuration reference, and SHA-256 integrity manifest. No TEST rows were loaded or evaluated.
+9. TRAIN-only calibration, threshold, and explainability analysis completed. No TEST rows were loaded, transcribed, or evaluated during development.
+10. Final all-TRAIN Logistic Regression pipeline fitted once and frozen with its exact 51-feature schema, model metadata, ASR configuration reference, and SHA-256 integrity manifest. No TEST rows were used to fit or alter it.
+11. One-time official held-out TEST evaluation completed with the frozen pipeline. The authoritative persisted output bundle contains 80 participant predictions and 240 frozen-ASR recordings; no TEST-based fitting, tuning, calibration, feature selection, threshold selection, or model modification occurred.
 
 ## Frozen decisions
 
@@ -60,6 +61,7 @@ Development code must call `ml.data.development_guard.assert_train_only`; it mus
 - Latest comparison: `artifacts/results/deployment_representation_comparison/`.
 - Explainability outputs: `artifacts/results/explainability/` — global SHAP/standardized-coefficient tables, feature-group reliance, deterministic TRAIN-only example explanations, figures, and provenance metadata.
 - Frozen inference artifacts: `artifacts/models/cognitive_screening_pipeline.joblib`, `artifacts/models/feature_schema.json`, `artifacts/models/model_metadata.json`, and `artifacts/models/model_manifest.json`. The manifest validates SHA-256 hashes for the pipeline, schema, metadata, and the existing frozen TRAIN ASR configuration.
+- Authoritative official TEST record: `artifacts/results/official_test_evaluation/` — persisted predictions, fixed-threshold metrics, 2,000-replicate descriptive bootstrap confidence intervals, descriptive diagnosis breakdown, metadata, and plots. Inspect these files directly; do **not** rerun the evaluator after TEST consumption.
 
 ## Actual observed metrics
 
@@ -146,13 +148,37 @@ The near-threshold demonstration score is `0.5298280909878464`, which is below `
 
 `feature_schema.json` rejects missing, duplicate, or unexpected features and explicitly reorders valid shuffled columns to the frozen feature order. `model_metadata.json` records the non-clinical score terminology, raw-score threshold rule, base.en CPU/int8/English ASR configuration, feature provenance, exclusions, and clearly labelled TRAIN-only development/OOF metrics. `model_manifest.json` records the environment and SHA-256 values. Its 320-row pre-save/post-load probability check had maximum absolute difference `0.0`.
 
+## One-time official held-out TEST evaluation
+
+**OFFICIAL TEST STATUS: CONSUMED FOR FINAL EVALUATION.** The predefined PROCESS-2 TEST partition was evaluated once after the ASR configuration, 51-feature representation, preprocessing pipeline, Logistic Regression `C=0.1`, raw score, and `0.53` TRAIN-derived research operating threshold had all been frozen. The authoritative record is the finalized, internally consistent persisted bundle in `artifacts/results/official_test_evaluation/`. It contains 80 participant predictions from 240 recordings. No fitting, tuning, calibration, feature selection, threshold selection, or model modification was performed using TEST results.
+
+The authoritative persisted metrics are:
+
+| Metric | Value |
+|---|---:|
+| Accuracy | 0.8000 |
+| Balanced accuracy | 0.8000 |
+| Precision | 0.8158 |
+| Sensitivity | 0.7750 |
+| Specificity | 0.8250 |
+| F1 | 0.7949 |
+| ROC-AUC | 0.8250 |
+| Brier score | 0.1739 |
+| Log loss | 0.5532 |
+
+At the unchanged threshold of `0.53`, the confusion counts are TN 33, FP 7, FN 9, and TP 31. The existing 2,000-replicate participant-level bootstrap confidence intervals are: accuracy 0.7125–0.8875; balanced accuracy 0.7084–0.8860; sensitivity 0.6410–0.8974; specificity 0.6977–0.9388; F1 0.6875–0.8842; and ROC-AUC 0.7260–0.9110. These are descriptive uncertainty intervals, not additional model fitting or tuning.
+
+The original-diagnosis descriptive breakdown is HC 33 Healthy-like / 7 Possible impairment-like, MCI 7 / 23, and Dementia 2 / 8. It is not a three-class evaluation and does not support diagnosis-specific threshold claims.
+
+During the first authorized held-out evaluation, two evaluator processes were inadvertently active concurrently before atomic single-run protection was introduced. Both used the same frozen model, feature schema, preprocessing, and threshold; no development decision changed between them. The duplicate process reported F1 0.800 and ROC-AUC 0.848 and is retained as an execution anomaly for transparency, not as another validation cohort or an alternative result. The finalized persisted bundle was designated authoritative by a procedural artifact-precedence rule rather than selecting the more favorable result. `scripts/evaluate_official_test.py` now retains an atomic lock for an attempted evaluation and refuses any subsequent invocation once `evaluation_metadata.json` exists. Do not rerun it; inspect the saved bundle and `docs/OFFICIAL_TEST_EVALUATION.md` instead.
+
 ## Current task and immediate next task
 
-The calibration, threshold, explainability, and final all-TRAIN artifact-freeze stages are complete. The next task is the one-time official TEST evaluation using the frozen pipeline, feature schema/order, raw score, and `0.53` TRAIN-derived research threshold. Do not begin another representation/model search or modify the frozen configuration before that evaluation.
+The ML research/model-development stage is closed. The next task is **production inference / FastAPI integration** using the already-frozen pipeline and schema. The React microphone workflow can follow that integration. Do not use the consumed TEST partition to redesign, tune, select, calibrate, or re-evaluate the model; future improvements require TRAIN-only development or, preferably, a new external validation cohort.
 
 ## Explicitly do not do
 
-- Do not run Whisper again for this completed TRAIN batch or process TEST.
+- Do not rerun `scripts/evaluate_official_test.py`, TEST ASR, or any TEST inference; the official partition is consumed.
 - Do not train on manual features and deploy untested ASR features as though they were interchangeable.
 - Do not use TEST for feature selection, tuning, thresholds, model choice, SHAP, or comparison.
 - Do not call the current multimodal result superior; its observed F1 and ROC-AUC were lower than ASR linguistic and its F1 gap was larger.

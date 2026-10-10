@@ -122,6 +122,13 @@ def claim_official_evaluation_lock(lock_path: Path = EVALUATION_LOCK_PATH) -> No
         os.close(descriptor)
 
 
+def assert_official_test_not_already_recorded(metadata_path: Path = METADATA_PATH) -> None:
+    """Reject any attempt to run a consumed official TEST evaluation again."""
+
+    if metadata_path.exists():
+        raise RuntimeError("Official TEST evaluation is already recorded; refusing a second evaluation run.")
+
+
 def _frozen_asr_config(artifacts: Any) -> WhisperTranscriptionConfig:
     """Build the transcriber config only from the hash-validated frozen record."""
 
@@ -365,8 +372,7 @@ def _transcribe_test(
 def main() -> int:
     """Perform the single authorized held-out evaluation and permanently record it."""
 
-    if METADATA_PATH.exists():
-        raise RuntimeError("Official TEST evaluation is already recorded; refusing a second evaluation run.")
+    assert_official_test_not_already_recorded()
     claim_official_evaluation_lock()
     if not TEST_ACOUSTIC_PATH.is_file():
         print(f"Required locked TEST acoustic feature table not found: {TEST_ACOUSTIC_PATH}")

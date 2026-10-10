@@ -15,6 +15,7 @@ from ml.models.modality_comparison import PURE_ACOUSTIC_SUFFIXES
 from scripts.evaluate_official_test import (
     BOOTSTRAP_RANDOM_STATE,
     FROZEN_THRESHOLD,
+    assert_official_test_not_already_recorded,
     bootstrap_confidence_intervals,
     claim_official_evaluation_lock,
     diagnosis_prediction_breakdown,
@@ -112,3 +113,52 @@ def test_official_evaluation_lock_is_atomic_and_preserves_audit_record(tmp_path:
     assert record["purpose"] == "one-time official held-out TEST evaluation"
     with pytest.raises(RuntimeError, match="lock already exists"):
         claim_official_evaluation_lock(lock_path)
+
+
+def test_consumed_evaluation_guard_refuses_an_existing_metadata_record(tmp_path: Path) -> None:
+    metadata_path = tmp_path / "evaluation_metadata.json"
+    metadata_path.write_text("{}", encoding="utf-8")
+    with pytest.raises(RuntimeError, match="already recorded"):
+        assert_official_test_not_already_recorded(metadata_path)
+
+
+def test_persisted_authoritative_bundle_reproduces_metrics_without_inference() -> None:
+    result_directory = Path(__file__).resolve().parents[2] / "artifacts" / "results" / "official_test_evaluation"
+    required = {
+        "test_predictions.csv",
+        "final_metrics.csv",
+        "bootstrap_confidence_intervals.csv",
+        "diagnosis_prediction_breakdown.csv",
+        "evaluation_metadata.json",
+        "confusion_matrix.png",
+        "roc_curve.png",
+        "test_score_distribution.png",
+    }
+    if not result_directory.is_dir():
+        pytest.skip("Official TEST bundle is unavailable in this checkout.")
+    assert all((result_directory / name).is_file() and (result_directory / name).stat().st_size > 0 for name in required)
+
+    predictions = pd.read_csv(result_directory / "test_predictions.csv")
+    assert len(predictions) == predictions["participant_id"].nunique() == 80
+    assert ((predictions["raw_model_score"] >= FROZEN_THRESHOLD).astype(int) == predictions["predicted_binary_label"]).all()
+    recalculated = fixed_threshold_metrics(
+        predictions["true_binary_label"].to_numpy(), predictions["raw_model_score"].to_numpy(), FROZEN_THRESHOLD
+    )
+    saved = pd.read_csv(result_directory / "final_metrics.csv").iloc[0]
+    for name, value in recalculated.items():
+        assert float(saved[name]) == pytest.approx(value)
+
+    metadata = json.loads((result_directory / "evaluation_metadata.json").read_text(encoding="utf-8"))
+    assert metadata["test_status"] == "CONSUMED FOR FINAL EVALUATION"
+    assert metadata["no_fitting_or_tuning_performed_on_test"] is True
+    assert metadata["threshold_was_not_modified_from_test_results"] is True
+
+
+def test_documentation_records_the_authoritative_persisted_result() -> None:
+    project_root = Path(__file__).resolve().parents[2]
+    for document in (project_root / "README.md", project_root / "docs" / "CODEX_HANDOFF.md", project_root / "docs" / "OFFICIAL_TEST_EVALUATION.md"):
+        text = document.read_text(encoding="utf-8")
+        assert "consumed" in text.casefold()
+        assert "0.7949" in text
+        assert "0.8250" in text
+        assert "0.8000" in text

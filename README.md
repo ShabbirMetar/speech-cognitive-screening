@@ -39,7 +39,7 @@ Figures and a compact summary CSV are written to `artifacts/results/eda/`. The E
 
 The official TEST split must remain untouched during model development. Metadata-level descriptive plots may summarize the complete dataset for documentation, but predictive feature analysis, feature selection, model fitting, and hyperparameter tuning must operate only on TRAIN participants.
 
-Feature extraction was applied deterministically and uniformly to all PROCESS-2 samples before model fitting. All feature selection, cross-validation, hyperparameter tuning, model comparison and threshold selection are restricted to the predefined TRAIN partition. The predefined TEST feature rows are isolated and reserved for one final evaluation after the complete pipeline is frozen.
+Feature extraction was applied deterministically and uniformly to all PROCESS-2 samples before model fitting. All feature selection, cross-validation, hyperparameter tuning, model comparison and threshold selection were restricted to the predefined TRAIN partition. The predefined TEST feature rows were evaluated once only after the complete pipeline was frozen; the TEST partition is now consumed and must not be used for further iterative development.
 
 ## Manual transcript processing
 
@@ -119,10 +119,13 @@ Completed research-pipeline stages are:
 - Focused TRAIN-only fusion comparison. The frozen deployment representation is `ASR_RATE_PLUS_CTD`: 32 ASR-compatible linguistic features, 6 ASR-count-derived speech-rate features, and 13 CTD waveform-only acoustic features (51 total). Logistic Regression is the frozen classifier family.
 - TRAIN-only calibration and threshold analysis. Raw Logistic Regression classifier scores are retained; the primary research operating threshold is `0.53`, selected independently by maximum balanced accuracy and Youden J on TRAIN out-of-fold scores. It is not a clinical or validated diagnostic threshold.
 - TRAIN-only SHAP explainability for the frozen 51-feature Logistic Regression model. SHAP values are calculated on the standardized model log-odds scale; they describe model behaviour, not causal or clinical biomarkers. Outputs are in `artifacts/results/explainability/`.
+- One-time held-out evaluation of the frozen pipeline on the predefined PROCESS-2 TEST partition (80 participants, 240 recordings). The authoritative persisted result bundle reports accuracy and balanced accuracy of `0.8000`, precision `0.8158`, sensitivity `0.7750`, specificity `0.8250`, F1 `0.7949`, ROC-AUC `0.8250`, Brier score `0.1739`, and log loss `0.5532`. These are final held-out research results, distinct from the TRAIN development metrics above.
 
 The current explainability fit selected `C=0.1` with five-fold TRAIN CV F1 selection (`0.650 ± 0.076` across folds). Its strongest global mean-absolute-SHAP features include PFT P-initial word count/ratio, CTD mean voice energy, SFT repeated-word count, and CTD silence ratio. The exact tables and figures are saved with the artifact outputs.
 
-The final all-TRAIN serialized pipeline, strict 51-feature schema, deployment metadata, and SHA-256 manifest are now available under `artifacts/models/`. The official TEST partition has not been evaluated. The next ML stage is one-time official TEST evaluation; FastAPI ML integration and the React microphone workflow remain future stages.
+The final all-TRAIN serialized pipeline, strict 51-feature schema, deployment metadata, and SHA-256 manifest are available under `artifacts/models/`. The predefined PROCESS-2 TEST partition was evaluated after the ASR configuration, feature representation, preprocessing pipeline, classifier, regularization, and operating threshold had been frozen. It is now **consumed** and must not be used for further model development or re-evaluation. The next stage is production inference / FastAPI integration; the React microphone workflow remains a future stage.
+
+The saved official record is `artifacts/results/official_test_evaluation/`; its metrics, bootstrap confidence intervals, confusion matrix, ROC curve, score-distribution plot, and descriptive diagnosis breakdown are documented in [docs/OFFICIAL_TEST_EVALUATION.md](docs/OFFICIAL_TEST_EVALUATION.md). During the first authorized evaluation, two evaluator processes inadvertently ran concurrently before atomic single-run protection was added. The finalized, internally consistent persisted bundle is the authoritative result by a procedural artifact-precedence rule—not because it was more favorable. The duplicate result is retained transparently as an execution anomaly in the evaluation note.
 
 Run the reproducible, TRAIN-only explainability analysis with:
 
