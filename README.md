@@ -120,6 +120,7 @@ Completed research-pipeline stages are:
 - TRAIN-only calibration and threshold analysis. Raw Logistic Regression classifier scores are retained; the primary research operating threshold is `0.53`, selected independently by maximum balanced accuracy and Youden J on TRAIN out-of-fold scores. It is not a clinical or validated diagnostic threshold.
 - TRAIN-only SHAP explainability for the frozen 51-feature Logistic Regression model. SHAP values are calculated on the standardized model log-odds scale; they describe model behaviour, not causal or clinical biomarkers. Outputs are in `artifacts/results/explainability/`.
 - One-time held-out evaluation of the frozen pipeline on the predefined PROCESS-2 TEST partition (80 participants, 240 recordings). The authoritative persisted result bundle reports accuracy and balanced accuracy of `0.8000`, precision `0.8158`, sensitivity `0.7750`, specificity `0.8250`, F1 `0.7949`, ROC-AUC `0.8250`, Brier score `0.1739`, and log loss `0.5532`. These are final held-out research results, distinct from the TRAIN development metrics above.
+- React result-page visualization enhancements: an aggregate-only 51-feature TRAIN reference profile, an expandable all-51 current-feature table, and an accessible filled screening-score bar. These additions do not alter model prediction or the consumed TEST record.
 
 The current explainability fit selected `C=0.1` with five-fold TRAIN CV F1 selection (`0.650 ± 0.076` across folds). Its strongest global mean-absolute-SHAP features include PFT P-initial word count/ratio, CTD mean voice energy, SFT repeated-word count, and CTD silence ratio. The exact tables and figures are saved with the artifact outputs.
 
@@ -152,7 +153,7 @@ Open [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs), confirm `GET /api
 
 Uploads are bounded (20 MiB per recording and 180 seconds by default), decoded transiently, converted to mono/16 kHz for processing, and stored only in a server-generated temporary directory during the request. Raw audio and transcripts are not persisted or logged by default. A single local inference lock serializes ASR requests for the intended CPU-only demo hardware.
 
-The analysis response includes transient transcripts, task durations and word counts, the 0–100 display-only Cognitive Speech Screening Score, the raw classifier score, the frozen `0.53` TRAIN-derived research operating threshold, readable observed speech characteristics, and exact local Logistic Regression log-odds contributions. The explanation describes how values contributed toward the model output; it is not a causal or clinical biomarker claim.
+The analysis response includes transient transcripts, task durations and word counts, the 0–100 display-only Cognitive Speech Screening Score, the raw classifier score, the frozen `0.53` TRAIN-derived research operating threshold, readable observed speech characteristics, and exact local Logistic Regression log-odds contributions. When the optional aggregate reference artifact is available, it also includes the current raw/model-input/standardized values for all 51 frozen predictors with aggregate Healthy TRAIN and Impaired TRAIN reference statistics. The explanation describes how values contributed toward the model output; it is not a causal or clinical biomarker claim.
 
 Local browser access is narrowly allowed from `http://localhost:5173` and `http://127.0.0.1:5173`. Override `SCREENING_CORS_ORIGINS` in the root `.env` only when another trusted development origin is required. Credentials are not enabled.
 
@@ -164,7 +165,7 @@ The React interface implements the complete local demonstration flow:
 2. Assessment introduction and one reusable microphone recorder for SFT, PFT, and CTD.
 3. Recording review with playback and re-recording.
 4. Multipart submission to the real FastAPI analysis endpoint and an indeterminate CPU-processing screen.
-5. Results with the returned screening score/classification, task summaries, automatic transcripts, neutral observed speech measurements, and exact model log-odds contribution explanations.
+5. Results with the returned screening score/classification, task summaries, automatic transcripts, neutral observed speech measurements, an all-51 standardized profile against descriptive TRAIN aggregates, and exact model log-odds contribution explanations.
 6. A new-assessment action that releases microphone tracks, revokes playback URLs, and clears speech data from browser memory.
 
 Install and start the frontend in a second PowerShell terminal:
@@ -185,6 +186,21 @@ The default frontend URL is [http://localhost:5173](http://localhost:5173). `VIT
 Speech blobs and playback object URLs remain in browser memory only and are not written to local storage. The backend uses request-scoped temporary files and does not persist audio or transcripts by default. Microphone access requires a supported modern browser and a secure context; `localhost` is treated as secure by current browsers.
 
 No authorized Cookie Theft stimulus image was found in the repository, so the application does not download or substitute a random image. For a supervised demonstration, the facilitator can display the authorized stimulus separately. If an appropriately licensed local/hosted asset becomes available, set `VITE_CTD_STIMULUS_URL` to its application-served URL before starting Vite.
+
+### Complete 51-feature profile
+
+`scripts/build_train_feature_reference.py` creates `artifacts/reference/train_feature_reference.json` from only the existing 320-participant TRAIN deployment table: 160 Healthy and 160 Impaired (MCI + Dementia) participants, with zero TEST rows. It stores aggregate per-feature means, medians, quartiles, valid counts, frozen standardized cohort means, coefficients, and fitted-model directions; it never stores participant-level rows or identifiers.
+
+The result page uses a common -3 to +3 standardized axis derived by the already-frozen median imputer and StandardScaler. It does not fit a new scaler. Raw reference statistics exclude mathematically undefined values (for example, an undefined Honoré statistic); raw missing values remain visibly undefined, while the table identifies when the frozen model used its TRAIN-derived median imputation. “Healthy TRAIN reference” and “Impaired TRAIN reference” are descriptive research aggregates, not clinical normal or disease ranges. A positive standardized coefficient means higher values push this fitted model toward its Possible impairment-like output; a negative coefficient means higher values push it toward its Healthy-like output. Neither statement is causal or clinical.
+
+The optional reference artifact is loaded once as visualization metadata at backend startup. If it is absent or invalid, inference still works and the result page reports the reference visualization as unavailable. It is not part of `artifacts/models/`, does not affect the frozen classifier, and must not be derived from the consumed TEST partition.
+
+To recreate the local aggregate-only visualization artifact from authorized TRAIN development files:
+
+```powershell
+cd D:\minorProject\Project\speech-cognitive-screening
+.\.venv\Scripts\python.exe .\scripts\build_train_feature_reference.py
+```
 
 ### Frontend verification
 

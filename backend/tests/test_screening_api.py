@@ -24,6 +24,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from app.main import create_app
+from app.api.schemas import ScreeningAnalysisResponse
 from app.services import screening_service
 from app.services.screening_service import AudioInputError, ScreeningService
 from ml.asr.asr_linguistic_features import ASR_COMPATIBLE_FEATURE_NAMES, PFT_FEATURE_NAMES
@@ -68,6 +69,41 @@ def _frozen_schema() -> dict[str, object]:
         "feature_count": 51,
         "ordered_feature_names": ordered,
         "feature_groups": {feature: feature_group(feature) for feature in ordered},
+    }
+
+
+def _feature_reference(schema: dict[str, object]) -> dict[str, object]:
+    """Return compact synthetic aggregate metadata with no participant rows."""
+
+    features = []
+    for index, feature in enumerate(schema["ordered_feature_names"]):
+        group = schema["feature_groups"][feature]
+        task = feature.partition("_")[0].upper()
+        coefficient = -0.2 if index % 2 else 0.2
+        stats = {"valid_n": 160, "mean": 1.0, "median": 1.0, "q25": 0.5, "q75": 1.5}
+        features.append(
+            {
+                "feature_key": feature,
+                "human_readable_label": feature,
+                "task": task,
+                "feature_group": group,
+                "unit": "value",
+                "healthy_reference": stats,
+                "impaired_reference": stats,
+                "healthy_reference_standardized_mean": -0.1,
+                "impaired_reference_standardized_mean": 0.1,
+                "coefficient": coefficient,
+            }
+        )
+    return {
+        "source": {
+            "participant_count": 320,
+            "healthy_participant_count": 160,
+            "impaired_participant_count": 160,
+            "official_test_participants_used": 0,
+            "standardized_statistics": "Frozen TRAIN-fitted median imputer followed by frozen StandardScaler; no scaler is fitted here.",
+        },
+        "features": features,
     }
 
 
@@ -143,6 +179,7 @@ def runtime(monkeypatch: pytest.MonkeyPatch) -> tuple[ScreeningService, dict[str
         return SimpleNamespace(
             feature_names=tuple(feature_table.columns),
             observed_values=feature_table.to_numpy(dtype=float),
+            imputed_values=feature_table.to_numpy(dtype=float),
             train_standardization_means=np.zeros(count, dtype=float),
             log_odds_contributions=np.linspace(-0.51, 0.51, count, dtype=float).reshape(1, -1),
         )
@@ -151,6 +188,11 @@ def runtime(monkeypatch: pytest.MonkeyPatch) -> tuple[ScreeningService, dict[str
     monkeypatch.setattr(screening_service, "extract_acoustic_feature_result", lambda *_: _fake_acoustic_result())
     monkeypatch.setattr(screening_service, "predict_screening", fake_predict)
     monkeypatch.setattr(screening_service, "linear_model_attributions", fake_attributions)
+    monkeypatch.setattr(
+        screening_service,
+        "transform_frozen_features",
+        lambda feature_table, _artifacts: np.linspace(-1.0, 1.0, feature_table.shape[1], dtype=float).reshape(1, -1),
+    )
     service = ScreeningService(
         artifacts=artifacts,
         whisper_config=WhisperTranscriptionConfig(model_size="base.en"),
@@ -239,8 +281,81 @@ def test_screening_api_validates_uploads_and_uses_research_terminology(runtime) 
     assert corrupt.status_code == 422
 
 
+def test_api_feature_profile_returns_all_frozen_fields_with_aggregate_references(runtime) -> None:
+    service, captured = runtime
+    service._feature_reference = _feature_reference(service._artifacts.schema)
+    output = service.analyze_uploads(
+        "profile-request",
+        {"SFT": _synthetic_wav_bytes(), "PFT": _synthetic_wav_bytes(), "CTD": _synthetic_wav_bytes()},
+    )
+    profile = output["feature_profile"]
+    assert profile is not None
+    assert profile["source_participants"] == 320
+    assert profile["official_test_participants_used"] == 0
+    assert len(profile["features"]) == 51
+    returned = profile["features"]
+    assert [item["feature_key"] for item in returned] == service._artifacts.schema["ordered_feature_names"]
+    np.testing.assert_allclose(
+        np.asarray([item["raw_value"] for item in returned], dtype=float),
+        captured["feature_table"].iloc[0].to_numpy(dtype=float),
+    )
+    np.testing.assert_allclose(
+        np.asarray([item["standardized_value"] for item in returned], dtype=float),
+        np.linspace(-1.0, 1.0, 51, dtype=float),
+    )
+    first = returned[0]
+    assert first["model_direction"] == "higher_values_toward_possible_impairment_like"
+    assert "participant_id" not in str(profile).lower()
+    for forbidden in ("original_diagnosis", "true_binary_label", "test_predictions", "participant_id"):
+        assert forbidden not in str(profile).lower()
+    assert len(ScreeningAnalysisResponse.model_validate(output).feature_profile.features) == 51
+
+
+def test_feature_profile_represents_undefined_raw_values_and_frozen_imputation(runtime, monkeypatch) -> None:
+    service, _ = runtime
+    service._feature_reference = _feature_reference(service._artifacts.schema)
+    original = screening_service.linear_model_attributions
+
+    def attribution_with_missing(feature_table, artifacts):
+        attribution = original(feature_table, artifacts)
+        attribution.observed_values[0, 0] = np.nan
+        attribution.imputed_values[0, 0] = 2.25
+        return attribution
+
+    monkeypatch.setattr(screening_service, "linear_model_attributions", attribution_with_missing)
+    output = service.analyze_uploads(
+        "undefined-feature-request",
+        {"SFT": _synthetic_wav_bytes(), "PFT": _synthetic_wav_bytes(), "CTD": _synthetic_wav_bytes()},
+    )
+    first = output["feature_profile"]["features"][0]
+    assert first["raw_value"] is None
+    assert first["model_input_value"] == pytest.approx(2.25)
+    assert first["was_median_imputed"] is True
+    ScreeningAnalysisResponse.model_validate(output)
+
+
+def test_optional_reference_absence_does_not_change_core_inference(runtime) -> None:
+    service, _ = runtime
+    inputs = {"SFT": _synthetic_wav_bytes(), "PFT": _synthetic_wav_bytes(), "CTD": _synthetic_wav_bytes()}
+    without_reference = service.analyze_uploads("without-reference", inputs)
+    assert without_reference["feature_profile"] is None
+    service._feature_reference = _feature_reference(service._artifacts.schema)
+    with_reference = service.analyze_uploads("with-reference", inputs)
+    assert with_reference["feature_profile"] is not None
+    assert with_reference["result"] == without_reference["result"]
+
+
 def test_runtime_has_no_model_fit_or_dataset_runtime_dependency() -> None:
     source = inspect.getsource(screening_service)
     assert ".fit(" not in source
-    for forbidden in ("development_features", "official_test", "get_dataset_root", "process2_dataset_path"):
+    # The profile response may truthfully report that zero TEST participants
+    # were used, but runtime source must never reference TEST inputs/results.
+    for forbidden in (
+        "development_features",
+        "official_test_evaluation",
+        "_TEST_LOCKED",
+        "deployment_features_test",
+        "get_dataset_root",
+        "process2_dataset_path",
+    ):
         assert forbidden not in source

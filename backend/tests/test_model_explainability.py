@@ -7,8 +7,12 @@ import pytest
 from ml.models.explainability import (
     RESEARCH_OPERATING_THRESHOLD,
     feature_group,
+    feature_task,
+    feature_unit,
     format_feature_contribution,
     human_feature_label,
+    model_direction,
+    model_direction_text,
     screening_classification,
     screening_score,
     select_example_indices,
@@ -21,6 +25,17 @@ def test_feature_group_and_labels_keep_the_frozen_modalities_readable() -> None:
     assert feature_group("ctd_pause_total_seconds") == "CTD_ACOUSTIC"
     assert human_feature_label("ctd_pause_total_seconds") == "CTD Total Pause Duration"
     assert human_feature_label("sft_type_token_ratio") == "SFT Lexical Diversity (TTR)"
+    assert feature_task("ctd_pause_total_seconds") == "CTD"
+    assert feature_unit("ctd_pause_total_seconds") == "seconds"
+    assert feature_unit("pft_p_initial_word_count") == "words"
+
+
+def test_model_direction_describes_only_the_fitted_coefficient_sign() -> None:
+    assert model_direction(0.01) == "higher_values_toward_possible_impairment_like"
+    assert model_direction(-0.01) == "higher_values_toward_healthy_like"
+    assert model_direction(0.0) == "weak_or_negligible_linear_effect"
+    assert "Possible impairment-like output" in model_direction_text(model_direction(0.01))
+    assert "Healthy-like output" in model_direction_text(model_direction(-0.01))
 
 
 def test_screening_score_and_research_threshold_are_display_only_helpers() -> None:

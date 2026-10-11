@@ -15,6 +15,11 @@ RESEARCH_OPERATING_THRESHOLD = 0.53
 ASR_RATE_SUFFIXES = ("recording_word_rate_wpm", "articulation_rate_wpm")
 
 FeatureGroup = Literal["ASR_LINGUISTIC", "ASR_RATE", "CTD_ACOUSTIC"]
+ModelDirection = Literal[
+    "higher_values_toward_possible_impairment_like",
+    "higher_values_toward_healthy_like",
+    "weak_or_negligible_linear_effect",
+]
 
 
 def feature_group(feature: str) -> FeatureGroup:
@@ -72,6 +77,49 @@ def human_feature_label(feature: str) -> str:
     return f"{task_label} {labels.get(suffix, suffix.replace('_', ' ').title())}"
 
 
+def feature_task(feature: str) -> str:
+    """Return the task prefix used by one frozen predictor."""
+
+    task, separator, _ = feature.partition("_")
+    if not separator or task not in {"sft", "pft", "ctd"}:
+        raise ValueError(f"Frozen feature does not have a recognised task prefix: {feature}")
+    return task.upper()
+
+
+def feature_unit(feature: str) -> str:
+    """Return a neutral display unit for one frozen predictor."""
+
+    _, separator, suffix = feature.partition("_")
+    if not separator:
+        return "value"
+    if suffix in {"word_count", "unique_word_count", "repeated_word_count", "filler_count", "p_initial_word_count"}:
+        return "words"
+    if suffix in {"type_token_ratio", "repetition_ratio", "filler_ratio", "p_initial_ratio", "silence_ratio"}:
+        return "ratio"
+    if suffix == "average_word_length":
+        return "characters"
+    if suffix in {"brunet_index", "honore_statistic"}:
+        return "index"
+    if suffix in {"recording_word_rate_wpm", "articulation_rate_wpm"}:
+        return "words per minute"
+    if suffix in {
+        "audio_duration_seconds",
+        "voiced_duration_seconds",
+        "silence_duration_seconds",
+        "pause_total_seconds",
+        "pause_mean_seconds",
+        "pause_max_seconds",
+    }:
+        return "seconds"
+    if suffix == "pause_count":
+        return "pauses"
+    if suffix in {"f0_mean_hz", "f0_std_hz", "f0_range_hz"}:
+        return "hertz"
+    if suffix in {"rms_mean", "rms_std"}:
+        return "normalized RMS"
+    return "value"
+
+
 def coefficient_direction(coefficient: float) -> str:
     """Describe a standardized coefficient direction, not a causal effect."""
 
@@ -80,6 +128,32 @@ def coefficient_direction(coefficient: float) -> str:
     if coefficient < 0:
         return "Toward Healthy-like class"
     return "No directional effect"
+
+
+def model_direction(coefficient: float, *, negligible_tolerance: float = 1e-12) -> ModelDirection:
+    """Encode the fitted linear-model direction without a clinical interpretation."""
+
+    value = float(coefficient)
+    if value > negligible_tolerance:
+        return "higher_values_toward_possible_impairment_like"
+    if value < -negligible_tolerance:
+        return "higher_values_toward_healthy_like"
+    return "weak_or_negligible_linear_effect"
+
+
+def model_direction_text(direction: ModelDirection) -> str:
+    """Return careful human-readable wording for a fitted-model direction."""
+
+    messages = {
+        "higher_values_toward_possible_impairment_like": (
+            "Higher values push this fitted model toward the Possible impairment-like output."
+        ),
+        "higher_values_toward_healthy_like": (
+            "Higher values push this fitted model toward the Healthy-like output."
+        ),
+        "weak_or_negligible_linear_effect": "This fitted model assigns a weak or negligible linear effect.",
+    }
+    return messages[direction]
 
 
 def screening_score(raw_model_score: float) -> float:

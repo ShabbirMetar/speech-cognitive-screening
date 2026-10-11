@@ -1,5 +1,7 @@
 import React from 'react'
 
+import FeatureProfile from './FeatureProfile.jsx'
+
 const BIOMARKER_DEFINITIONS = {
   type_token_ratio: 'The proportion of distinct words in the automatic transcript.',
   recording_word_rate_wpm: 'Recognized words divided by the complete recording duration.',
@@ -23,15 +25,15 @@ function definitionFor(featureKey) {
   return BIOMARKER_DEFINITIONS[suffix] || 'A speech characteristic measured by the frozen feature pipeline.'
 }
 
-function ScoreGauge({ score, threshold }) {
+export function ScoreGauge({ score, threshold }) {
   const safeScore = Math.min(100, Math.max(0, score))
   return (
-    <div className="score-gauge" role="img" aria-label={`Screening score ${safeScore.toFixed(0)} out of 100; research operating point ${threshold.toFixed(0)}`}>
+    <div className="score-gauge" role="meter" aria-label="Cognitive Speech Screening Score" aria-valuemin="0" aria-valuemax="100" aria-valuenow={safeScore} aria-valuetext={`Cognitive Speech Screening Score: ${safeScore.toFixed(0)} out of 100. Research operating point: ${threshold.toFixed(0)}.`}>
       <div className="score-gauge__labels" aria-hidden="true"><span>0</span><span>100</span></div>
       <div className="score-gauge__track">
-        <span className="score-gauge__fill" style={{ width: `${safeScore}%` }} />
-        <span className="score-gauge__threshold" style={{ left: `${threshold}%` }} />
-        <span className="score-gauge__marker" style={{ left: `${safeScore}%` }} />
+        <div className="score-gauge__fill" data-testid="score-fill" style={{ width: `${safeScore}%` }} aria-hidden="true" />
+        <span className="score-gauge__threshold" data-testid="threshold-marker" style={{ left: `${threshold}%` }} aria-hidden="true" />
+        <span className="score-gauge__marker" data-testid="score-marker" style={{ left: `${safeScore}%` }} aria-hidden="true" />
       </div>
       <p><span className="threshold-key" aria-hidden="true" /> Research operating point: {threshold.toFixed(0)} / 100</p>
     </div>
@@ -59,7 +61,7 @@ function ContributionList({ title, items, tone }) {
 }
 
 export default function ResultsPage({ response, onRestart }) {
-  const { result, tasks, observed_biomarkers: biomarkers, explanation, model } = response
+  const { result, tasks, observed_biomarkers: biomarkers, feature_profile: featureProfile, explanation, model } = response
   const score = result.cognitive_speech_screening_score
   const thresholdDisplay = result.research_threshold * 100
   return (
@@ -100,6 +102,8 @@ export default function ResultsPage({ response, onRestart }) {
           ))}
         </div>
       </section>
+
+      <FeatureProfile profile={featureProfile} />
 
       <section className="results-section" aria-labelledby="explanation-heading">
         <div className="section-heading"><p className="eyebrow">Local model explanation · log-odds scale</p><h2 id="explanation-heading">Factors influencing this model output</h2><p>These values explain the behavior of this machine-learning model; they do not establish medical causes or represent probability changes.</p></div>

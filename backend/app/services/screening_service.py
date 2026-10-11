@@ -27,14 +27,16 @@ from ml.asr.whisper_transcriber import (
 )
 from ml.audio.acoustic_features import extract_acoustic_feature_result, speech_rate_features
 from ml.audio.audio_loader import AudioData, AudioValidationError, load_and_normalize_audio
-from ml.models.explainability import format_feature_contribution, human_feature_label
+from ml.models.explainability import format_feature_contribution, human_feature_label, model_direction
 from ml.models.frozen_pipeline import (
     FrozenScreeningArtifacts,
     linear_model_attributions,
     load_frozen_artifacts,
     predict_screening,
+    transform_frozen_features,
     validate_and_order_features,
 )
+from ml.models.train_feature_reference import load_train_feature_reference, validate_reference_model_alignment
 
 from ..core.config import Settings, get_settings
 
@@ -143,6 +145,7 @@ class ScreeningService:
         max_upload_bytes: int,
         max_duration_seconds: float,
         target_sample_rate: int,
+        feature_reference: Mapping[str, object] | None = None,
     ) -> None:
         self._artifacts = artifacts
         self._whisper_config = whisper_config
@@ -150,6 +153,9 @@ class ScreeningService:
         self._max_upload_bytes = int(max_upload_bytes)
         self._max_duration_seconds = float(max_duration_seconds)
         self._target_sample_rate = int(target_sample_rate)
+        # This compact aggregate-only metadata is optional. It is never passed
+        # to the classifier and may be absent without affecting inference.
+        self._feature_reference = dict(feature_reference) if feature_reference is not None else None
         self._inference_lock = Lock()
 
     @classmethod
@@ -164,6 +170,15 @@ class ScreeningService:
         except Exception as error:
             LOGGER.exception("Frozen screening runtime initialization failed: %s", error.__class__.__name__)
             raise ModelRuntimeUnavailable("Frozen screening runtime could not be initialized.") from error
+        try:
+            reference = load_train_feature_reference(artifacts.schema)
+            validate_reference_model_alignment(reference, artifacts.pipeline, artifacts.schema)
+        except Exception as error:
+            # The aggregate reference is an optional visual aid. Filesystem,
+            # decoding, or validation failures must not make the hash-checked
+            # frozen inference service unavailable.
+            LOGGER.warning("TRAIN visualization reference unavailable: %s", error.__class__.__name__)
+            reference = None
         return cls(
             artifacts,
             config,
@@ -171,6 +186,7 @@ class ScreeningService:
             max_upload_bytes=active_settings.screening_max_upload_bytes,
             max_duration_seconds=active_settings.screening_max_duration_seconds,
             target_sample_rate=active_settings.screening_target_sample_rate,
+            feature_reference=reference,
         )
 
     @property
@@ -218,6 +234,7 @@ class ScreeningService:
                     feature_frame = self._assemble_frozen_feature_frame(processed)
                     prediction = predict_screening(feature_frame, self._artifacts)[0]
                     explanation = self._build_explanation(feature_frame)
+                    feature_profile = self._build_feature_profile(feature_frame)
                     response = {
                         "request_id": request_id,
                         "result": {
@@ -236,6 +253,7 @@ class ScreeningService:
                             for task, item in processed.items()
                         },
                         "observed_biomarkers": self._observed_speech_characteristics(feature_frame.iloc[0]),
+                        "feature_profile": feature_profile,
                         "explanation": explanation,
                         "model": self.model_info(),
                         "disclaimer": "Research screening prototype; this result is not a medical diagnosis.",
@@ -347,6 +365,69 @@ class ScreeningService:
             "toward_impairment_like": self._contribution_rows(attribution, contributions, positive=True),
             "toward_healthy_like": self._contribution_rows(attribution, contributions, positive=False),
         }
+
+    def _build_feature_profile(self, feature_frame: pd.DataFrame) -> dict[str, object] | None:
+        """Return current values plus aggregate-only TRAIN references when available.
+
+        The reference file is visualization metadata only. The exact frozen
+        pipeline remains the sole source of prediction and preprocessing.
+        """
+
+        if self._feature_reference is None:
+            return None
+        try:
+            attribution = linear_model_attributions(feature_frame, self._artifacts)
+            standardized = transform_frozen_features(feature_frame, self._artifacts)[0]
+            reference_entries = self._feature_reference["features"]
+            if not isinstance(reference_entries, list):
+                raise ValueError("Feature reference entries are invalid.")
+            reference_by_key = {str(item["feature_key"]): item for item in reference_entries if isinstance(item, dict)}
+            if list(attribution.feature_names) != list(reference_by_key):
+                raise ValueError("Feature reference ordering does not match frozen model ordering.")
+            entries: list[dict[str, object]] = []
+            for index, feature in enumerate(attribution.feature_names):
+                reference = reference_by_key[feature]
+                coefficient = float(reference["coefficient"])
+                entries.append(
+                    {
+                        "feature_key": feature,
+                        "label": str(reference["human_readable_label"]),
+                        "task": str(reference["task"]),
+                        "group": str(reference["feature_group"]),
+                        "unit": str(reference["unit"]),
+                        "raw_value": _finite_or_none(attribution.observed_values[0, index]),
+                        "model_input_value": _finite_or_none(attribution.imputed_values[0, index]),
+                        "was_median_imputed": not np.isfinite(attribution.observed_values[0, index]),
+                        "standardized_value": float(standardized[index]),
+                        "healthy_reference": reference["healthy_reference"],
+                        "impaired_reference": reference["impaired_reference"],
+                        "healthy_reference_standardized": float(reference["healthy_reference_standardized_mean"]),
+                        "impaired_reference_standardized": float(reference["impaired_reference_standardized_mean"]),
+                        "coefficient": coefficient,
+                        "model_direction": model_direction(coefficient),
+                        "local_log_odds_contribution": float(attribution.log_odds_contributions[0, index]),
+                    }
+                )
+            source = self._feature_reference["source"]
+            if not isinstance(source, dict):
+                raise ValueError("Feature reference source metadata is invalid.")
+            return {
+                "available": True,
+                "source_description": (
+                    "Comparison with descriptive reference profiles from the 320-participant PROCESS-2 TRAIN partition. "
+                    "These references are research aggregates, not clinical normal ranges."
+                ),
+                "source_participants": int(source["participant_count"]),
+                "healthy_train_participants": int(source["healthy_participant_count"]),
+                "impaired_train_participants": int(source["impaired_participant_count"]),
+                "official_test_participants_used": int(source["official_test_participants_used"]),
+                "standardized_value_method": str(source["standardized_statistics"]),
+                "features": entries,
+            }
+        except Exception as error:
+            # An optional visual aid must never make core inference unavailable.
+            LOGGER.warning("feature_profile_unavailable category=%s", error.__class__.__name__)
+            return None
 
     @staticmethod
     def _contribution_rows(attribution: Any, contributions: np.ndarray, *, positive: bool) -> list[dict[str, object]]:

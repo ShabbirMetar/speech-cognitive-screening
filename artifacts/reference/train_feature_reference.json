@@ -1,0 +1,1395 @@
+{
+  "artifact_role": "TRAIN-only aggregated visualization reference; does not affect model prediction",
+  "artifact_version": "1.0.0",
+  "created_at_utc": "2026-10-10T19:00:11.372307+00:00",
+  "features": [
+    {
+      "coefficient": 0.07899134825976449,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "ctd_word_count",
+      "healthy_reference": {
+        "mean": 156.80625,
+        "median": 137.0,
+        "q25": 97.75,
+        "q75": 205.0,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.1394628427312501,
+      "human_readable_label": "CTD Word Count",
+      "impaired_reference": {
+        "mean": 132.3875,
+        "median": 105.5,
+        "q25": 70.75,
+        "q75": 173.5,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.13946284273125037,
+      "model_direction": "higher_values_toward_possible_impairment_like",
+      "overall_train_mean": 144.596875,
+      "overall_train_std": 87.54572014230264,
+      "task": "CTD",
+      "unit": "words"
+    },
+    {
+      "coefficient": 0.04616984396131209,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "pft_word_count",
+      "healthy_reference": {
+        "mean": 25.675,
+        "median": 23.5,
+        "q25": 18.0,
+        "q75": 31.0,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.04028934016322468,
+      "human_readable_label": "PFT Word Count",
+      "impaired_reference": {
+        "mean": 24.7375,
+        "median": 22.0,
+        "q25": 16.0,
+        "q75": 31.0,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.0402893401632247,
+      "model_direction": "higher_values_toward_possible_impairment_like",
+      "overall_train_mean": 25.20625,
+      "overall_train_std": 11.63459113753036,
+      "task": "PFT",
+      "unit": "words"
+    },
+    {
+      "coefficient": -0.026310443530132174,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "sft_word_count",
+      "healthy_reference": {
+        "mean": 36.2875,
+        "median": 33.0,
+        "q25": 26.0,
+        "q75": 43.25,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.015215793475635056,
+      "human_readable_label": "SFT Word Count",
+      "impaired_reference": {
+        "mean": 35.78125,
+        "median": 32.5,
+        "q25": 22.0,
+        "q75": 42.0,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.015215793475634742,
+      "model_direction": "higher_values_toward_healthy_like",
+      "overall_train_mean": 36.034375,
+      "overall_train_std": 16.635675320207923,
+      "task": "SFT",
+      "unit": "words"
+    },
+    {
+      "coefficient": -0.05126172166552075,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "ctd_unique_word_count",
+      "healthy_reference": {
+        "mean": 87.64375,
+        "median": 80.5,
+        "q25": 61.75,
+        "q75": 109.25,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.16382336422864047,
+      "human_readable_label": "CTD Unique Word Count",
+      "impaired_reference": {
+        "mean": 75.86875,
+        "median": 69.0,
+        "q25": 48.75,
+        "q75": 97.0,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.16382336422864013,
+      "model_direction": "higher_values_toward_healthy_like",
+      "overall_train_mean": 81.75625,
+      "overall_train_std": 35.93809727764535,
+      "task": "CTD",
+      "unit": "words"
+    },
+    {
+      "coefficient": 0.04165883581621455,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "pft_unique_word_count",
+      "healthy_reference": {
+        "mean": 21.475,
+        "median": 21.0,
+        "q25": 16.0,
+        "q75": 26.0,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.04286371419818296,
+      "human_readable_label": "PFT Unique Word Count",
+      "impaired_reference": {
+        "mean": 20.74375,
+        "median": 19.0,
+        "q25": 14.0,
+        "q75": 26.0,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.04286371419818293,
+      "model_direction": "higher_values_toward_possible_impairment_like",
+      "overall_train_mean": 21.109375,
+      "overall_train_std": 8.529942092967278,
+      "task": "PFT",
+      "unit": "words"
+    },
+    {
+      "coefficient": -0.17796504526861207,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "sft_unique_word_count",
+      "healthy_reference": {
+        "mean": 32.24375,
+        "median": 31.0,
+        "q25": 24.75,
+        "q75": 39.0,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.08731062720988256,
+      "human_readable_label": "SFT Unique Word Count",
+      "impaired_reference": {
+        "mean": 30.175,
+        "median": 28.5,
+        "q25": 21.0,
+        "q75": 36.0,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.08731062720988281,
+      "model_direction": "higher_values_toward_healthy_like",
+      "overall_train_mean": 31.209375,
+      "overall_train_std": 11.847068713794776,
+      "task": "SFT",
+      "unit": "words"
+    },
+    {
+      "coefficient": 0.034353124841989956,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "ctd_type_token_ratio",
+      "healthy_reference": {
+        "mean": 0.5990417237533245,
+        "median": 0.5957660540218767,
+        "q25": 0.5231415643180349,
+        "q75": 0.6650526197939991,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": -0.1719475467044867,
+      "human_readable_label": "CTD Lexical Diversity (TTR)",
+      "impaired_reference": {
+        "mean": 0.6342695826381624,
+        "median": 0.6368572695035462,
+        "q25": 0.5609051177216975,
+        "q75": 0.7035732581967213,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": 0.17194754670448548,
+      "model_direction": "higher_values_toward_possible_impairment_like",
+      "overall_train_mean": 0.6166556531957436,
+      "overall_train_std": 0.10243780606355907,
+      "task": "CTD",
+      "unit": "ratio"
+    },
+    {
+      "coefficient": -0.11019498471299276,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "pft_type_token_ratio",
+      "healthy_reference": {
+        "mean": 0.8707211495177012,
+        "median": 0.9023809523809524,
+        "q25": 0.8324468085106383,
+        "q75": 0.9636015325670497,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.030975196523760313,
+      "human_readable_label": "PFT Lexical Diversity (TTR)",
+      "impaired_reference": {
+        "mean": 0.8623309320027079,
+        "median": 0.8947368421052632,
+        "q25": 0.8125,
+        "q75": 0.9569746376811594,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.03097519652376034,
+      "model_direction": "higher_values_toward_healthy_like",
+      "overall_train_mean": 0.8665260407602045,
+      "overall_train_std": 0.13543445170004387,
+      "task": "PFT",
+      "unit": "ratio"
+    },
+    {
+      "coefficient": -0.12735852814750698,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "sft_type_token_ratio",
+      "healthy_reference": {
+        "mean": 0.905574592726077,
+        "median": 0.9154761904761906,
+        "q25": 0.8571428571428571,
+        "q75": 0.9689867424242424,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.15139865189492668,
+      "human_readable_label": "SFT Lexical Diversity (TTR)",
+      "impaired_reference": {
+        "mean": 0.8756770039433608,
+        "median": 0.9,
+        "q25": 0.8246323529411764,
+        "q75": 0.95,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.15139865189492743,
+      "model_direction": "higher_values_toward_healthy_like",
+      "overall_train_mean": 0.8906257983347189,
+      "overall_train_std": 0.09873796235472979,
+      "task": "SFT",
+      "unit": "ratio"
+    },
+    {
+      "coefficient": -0.049882503453226354,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "ctd_average_word_length",
+      "healthy_reference": {
+        "mean": 4.107175451216979,
+        "median": 4.099840619307832,
+        "q25": 3.9853746866004274,
+        "q75": 4.187126148258919,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": -0.011816128460500836,
+      "human_readable_label": "CTD Average Word Length",
+      "impaired_reference": {
+        "mean": 4.112035284251602,
+        "median": 4.107919254658385,
+        "q25": 3.962468945936354,
+        "q75": 4.222916666666666,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": 0.011816128460496872,
+      "model_direction": "higher_values_toward_healthy_like",
+      "overall_train_mean": 4.109605367734291,
+      "overall_train_std": 0.2056440504548697,
+      "task": "CTD",
+      "unit": "characters"
+    },
+    {
+      "coefficient": -0.20221307587719078,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "pft_average_word_length",
+      "healthy_reference": {
+        "mean": 5.996876464021137,
+        "median": 5.794736842105264,
+        "q25": 5.222451274362819,
+        "q75": 6.674242424242425,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.25072395373763745,
+      "human_readable_label": "PFT Average Word Length",
+      "impaired_reference": {
+        "mean": 5.434578198899956,
+        "median": 5.413651315789474,
+        "q25": 4.576388888888888,
+        "q75": 6.172788605697152,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.2507239537376375,
+      "model_direction": "higher_values_toward_healthy_like",
+      "overall_train_mean": 5.715727331460547,
+      "overall_train_std": 1.121349310145254,
+      "task": "PFT",
+      "unit": "characters"
+    },
+    {
+      "coefficient": 0.0032780271867534102,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "sft_average_word_length",
+      "healthy_reference": {
+        "mean": 5.173754158616492,
+        "median": 5.224014336917563,
+        "q25": 4.802952329360781,
+        "q75": 5.527018633540372,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.13408366427650595,
+      "human_readable_label": "SFT Average Word Length",
+      "impaired_reference": {
+        "mean": 5.008813571957186,
+        "median": 4.970763977806231,
+        "q25": 4.575757575757576,
+        "q75": 5.426858108108108,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.13408366427650642,
+      "model_direction": "higher_values_toward_possible_impairment_like",
+      "overall_train_mean": 5.091283865286838,
+      "overall_train_std": 0.6150659274912419,
+      "task": "SFT",
+      "unit": "characters"
+    },
+    {
+      "coefficient": 0.1649794957267096,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "ctd_repeated_word_count",
+      "healthy_reference": {
+        "mean": 69.1625,
+        "median": 55.0,
+        "q25": 34.0,
+        "q75": 96.5,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.1190942001762599,
+      "human_readable_label": "CTD Repeated Word Count",
+      "impaired_reference": {
+        "mean": 56.51875,
+        "median": 38.0,
+        "q25": 21.75,
+        "q75": 74.25,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.11909420017626002,
+      "model_direction": "higher_values_toward_possible_impairment_like",
+      "overall_train_mean": 62.840625,
+      "overall_train_std": 53.08297961314318,
+      "task": "CTD",
+      "unit": "words"
+    },
+    {
+      "coefficient": 0.027916585154186293,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "pft_repeated_word_count",
+      "healthy_reference": {
+        "mean": 4.2,
+        "median": 2.0,
+        "q25": 1.0,
+        "q75": 5.0,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.01583379720386685,
+      "human_readable_label": "PFT Repeated Word Count",
+      "impaired_reference": {
+        "mean": 3.99375,
+        "median": 3.0,
+        "q25": 1.0,
+        "q75": 5.0,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.01583379720386683,
+      "model_direction": "higher_values_toward_possible_impairment_like",
+      "overall_train_mean": 4.096875,
+      "overall_train_std": 6.512967083777946,
+      "task": "PFT",
+      "unit": "words"
+    },
+    {
+      "coefficient": 0.26063519744056396,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "sft_repeated_word_count",
+      "healthy_reference": {
+        "mean": 4.04375,
+        "median": 3.0,
+        "q25": 1.0,
+        "q75": 6.0,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": -0.12187983811620044,
+      "human_readable_label": "SFT Repeated Word Count",
+      "impaired_reference": {
+        "mean": 5.60625,
+        "median": 3.0,
+        "q25": 1.0,
+        "q75": 6.0,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": 0.12187983811620044,
+      "model_direction": "higher_values_toward_possible_impairment_like",
+      "overall_train_mean": 4.825,
+      "overall_train_std": 6.410001950077707,
+      "task": "SFT",
+      "unit": "words"
+    },
+    {
+      "coefficient": -0.03435312484198971,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "ctd_repetition_ratio",
+      "healthy_reference": {
+        "mean": 0.40095827624667535,
+        "median": 0.40423394597812334,
+        "q25": 0.33494738020600084,
+        "q75": 0.47685843568196506,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.17194754670448645,
+      "human_readable_label": "CTD Repetition Ratio",
+      "impaired_reference": {
+        "mean": 0.3657304173618376,
+        "median": 0.3631427304964539,
+        "q25": 0.29642674180327866,
+        "q75": 0.4390948822783025,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.17194754670448564,
+      "model_direction": "higher_values_toward_healthy_like",
+      "overall_train_mean": 0.38334434680425644,
+      "overall_train_std": 0.10243780606355908,
+      "task": "CTD",
+      "unit": "ratio"
+    },
+    {
+      "coefficient": 0.11019498471299286,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "pft_repetition_ratio",
+      "healthy_reference": {
+        "mean": 0.12927885048229895,
+        "median": 0.0976190476190476,
+        "q25": 0.03639846743295015,
+        "q75": 0.16755319148936165,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": -0.030975196523760316,
+      "human_readable_label": "PFT Repetition Ratio",
+      "impaired_reference": {
+        "mean": 0.13766906799729212,
+        "median": 0.1052631578947368,
+        "q25": 0.04302536231884055,
+        "q75": 0.1875,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": 0.03097519652376036,
+      "model_direction": "higher_values_toward_possible_impairment_like",
+      "overall_train_mean": 0.13347395923979552,
+      "overall_train_std": 0.13543445170004387,
+      "task": "PFT",
+      "unit": "ratio"
+    },
+    {
+      "coefficient": 0.12735852814750684,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "sft_repetition_ratio",
+      "healthy_reference": {
+        "mean": 0.09442540727392298,
+        "median": 0.0845238095238095,
+        "q25": 0.031013257575757576,
+        "q75": 0.1428571428571428,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": -0.15139865189492716,
+      "human_readable_label": "SFT Repetition Ratio",
+      "impaired_reference": {
+        "mean": 0.12432299605663928,
+        "median": 0.1,
+        "q25": 0.05,
+        "q75": 0.17536764705882352,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": 0.15139865189492688,
+      "model_direction": "higher_values_toward_possible_impairment_like",
+      "overall_train_mean": 0.10937420166528114,
+      "overall_train_std": 0.09873796235472977,
+      "task": "SFT",
+      "unit": "ratio"
+    },
+    {
+      "coefficient": -0.16830727650661095,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "ctd_filler_count",
+      "healthy_reference": {
+        "mean": 0.0375,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 1.6653345369377347e-17,
+      "human_readable_label": "CTD Filler Count",
+      "impaired_reference": {
+        "mean": 0.0375,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -5.551115123125783e-18,
+      "model_direction": "higher_values_toward_healthy_like",
+      "overall_train_mean": 0.0375,
+      "overall_train_std": 0.43857011982122085,
+      "task": "CTD",
+      "unit": "words"
+    },
+    {
+      "coefficient": 0.031005772116527698,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "pft_filler_count",
+      "healthy_reference": {
+        "mean": 0.36875,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": -0.06921411691679827,
+      "human_readable_label": "PFT Filler Count",
+      "impaired_reference": {
+        "mean": 0.60625,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": 0.06921411691679827,
+      "model_direction": "higher_values_toward_possible_impairment_like",
+      "overall_train_mean": 0.4875,
+      "overall_train_std": 1.715690458678371,
+      "task": "PFT",
+      "unit": "words"
+    },
+    {
+      "coefficient": 0.01931883777002,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "sft_filler_count",
+      "healthy_reference": {
+        "mean": 0.325,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.05366348496352548,
+      "human_readable_label": "SFT Filler Count",
+      "impaired_reference": {
+        "mean": 0.225,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.05366348496352548,
+      "model_direction": "higher_values_toward_possible_impairment_like",
+      "overall_train_mean": 0.275,
+      "overall_train_std": 0.9317322576792112,
+      "task": "SFT",
+      "unit": "words"
+    },
+    {
+      "coefficient": 0.18447246351590324,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "ctd_filler_ratio",
+      "healthy_reference": {
+        "mean": 0.0001062965324015044,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": -0.042010076090506755,
+      "human_readable_label": "CTD Filler Ratio",
+      "impaired_reference": {
+        "mean": 0.00045180722891566245,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": 0.04201007609050673,
+      "model_direction": "higher_values_toward_possible_impairment_like",
+      "overall_train_mean": 0.00027905188065858343,
+      "overall_train_std": 0.004112236023683792,
+      "task": "CTD",
+      "unit": "ratio"
+    },
+    {
+      "coefficient": -0.06390668872924303,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "pft_filler_ratio",
+      "healthy_reference": {
+        "mean": 0.013279601661891682,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": -0.04650132309602869,
+      "human_readable_label": "PFT Filler Ratio",
+      "impaired_reference": {
+        "mean": 0.01809037762866985,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": 0.04650132309602876,
+      "model_direction": "higher_values_toward_healthy_like",
+      "overall_train_mean": 0.015684989645280763,
+      "overall_train_std": 0.05172730200432742,
+      "task": "PFT",
+      "unit": "ratio"
+    },
+    {
+      "coefficient": -0.05623135125730231,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "sft_filler_ratio",
+      "healthy_reference": {
+        "mean": 0.008491728985290523,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.05437558692772049,
+      "human_readable_label": "SFT Filler Ratio",
+      "impaired_reference": {
+        "mean": 0.005822316459965609,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.05437558692772071,
+      "model_direction": "higher_values_toward_healthy_like",
+      "overall_train_mean": 0.0071570227226280675,
+      "overall_train_std": 0.024546057120020275,
+      "task": "SFT",
+      "unit": "ratio"
+    },
+    {
+      "coefficient": -0.15079311528723097,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "ctd_brunet_index",
+      "healthy_reference": {
+        "mean": 10.776868059647796,
+        "median": 10.736425296288893,
+        "q25": 10.01257387801181,
+        "q75": 11.655759733760611,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.19877245504842783,
+      "human_readable_label": "CTD Brunet Vocabulary Richness",
+      "impaired_reference": {
+        "mean": 10.252923459270814,
+        "median": 10.268918275381008,
+        "q25": 9.406602618739228,
+        "q75": 11.205718801565304,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.1987724550484302,
+      "model_direction": "higher_values_toward_healthy_like",
+      "overall_train_mean": 10.514895759459307,
+      "overall_train_std": 1.3179507197044151,
+      "task": "CTD",
+      "unit": "index"
+    },
+    {
+      "coefficient": -0.18058099938899969,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "pft_brunet_index",
+      "healthy_reference": {
+        "mean": 7.010654830056258,
+        "median": 6.78316281840867,
+        "q25": 6.140908713194626,
+        "q75": 7.399205129945013,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.0968243173562998,
+      "human_readable_label": "PFT Brunet Vocabulary Richness",
+      "impaired_reference": {
+        "mean": 6.712090760005696,
+        "median": 6.642431821740406,
+        "q25": 6.051907351843308,
+        "q75": 7.4334255578808754,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.09682431735629972,
+      "model_direction": "higher_values_toward_healthy_like",
+      "overall_train_mean": 6.861372795030976,
+      "overall_train_std": 1.5417824685088617,
+      "task": "PFT",
+      "unit": "index"
+    },
+    {
+      "coefficient": -0.18122087007071389,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "sft_brunet_index",
+      "healthy_reference": {
+        "mean": 7.4051147221789195,
+        "median": 7.351073931642305,
+        "q25": 6.891257937941946,
+        "q75": 7.937165892441165,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.013703476189290348,
+      "human_readable_label": "SFT Brunet Vocabulary Richness",
+      "impaired_reference": {
+        "mean": 7.379310866167671,
+        "median": 7.28238592418132,
+        "q25": 6.527572544106652,
+        "q75": 7.881141923796679,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.01370347618928901,
+      "model_direction": "higher_values_toward_healthy_like",
+      "overall_train_mean": 7.392212794173295,
+      "overall_train_std": 0.9415076749436714,
+      "task": "SFT",
+      "unit": "index"
+    },
+    {
+      "coefficient": -0.11035781180203988,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "ctd_honore_statistic",
+      "healthy_reference": {
+        "mean": 1880.1301145738544,
+        "median": 1742.3569981159562,
+        "q25": 1540.1027066690995,
+        "q75": 2033.0771775176677,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": -0.07311514516892445,
+      "human_readable_label": "CTD Honor\u00e9 Vocabulary Richness",
+      "impaired_reference": {
+        "mean": 1982.919626280919,
+        "median": 1817.5620834293572,
+        "q25": 1535.8967881866754,
+        "q75": 2203.4741157768294,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": 0.07311514516892477,
+      "model_direction": "higher_values_toward_healthy_like",
+      "overall_train_mean": 1931.5248704273865,
+      "overall_train_std": 702.9289996592431,
+      "task": "CTD",
+      "unit": "index"
+    },
+    {
+      "coefficient": 0.21924867337245085,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "pft_honore_statistic",
+      "healthy_reference": {
+        "mean": 3345.914120292651,
+        "median": 2750.1107519443435,
+        "q25": 1824.581079966183,
+        "q75": 4270.331477870186,
+        "valid_n": 124
+      },
+      "healthy_reference_standardized_mean": 0.00927020700549951,
+      "human_readable_label": "PFT Honor\u00e9 Vocabulary Richness",
+      "impaired_reference": {
+        "mean": 3269.964196719632,
+        "median": 2555.686661270812,
+        "q25": 1694.9620428522378,
+        "q75": 4158.883083359673,
+        "valid_n": 129
+      },
+      "impaired_reference_standardized_mean": -0.00927020700549951,
+      "model_direction": "higher_values_toward_possible_impairment_like",
+      "overall_train_mean": 3307.1886651902028,
+      "overall_train_std": 2273.750641165734,
+      "task": "PFT",
+      "unit": "index"
+    },
+    {
+      "coefficient": 0.06992036131460076,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "sft_honore_statistic",
+      "healthy_reference": {
+        "mean": 5144.664703629805,
+        "median": 3959.2243067575127,
+        "q25": 2719.896749388098,
+        "q75": 6403.0319769131365,
+        "valid_n": 130
+      },
+      "healthy_reference_standardized_mean": 0.16274265959287929,
+      "human_readable_label": "SFT Honor\u00e9 Vocabulary Richness",
+      "impaired_reference": {
+        "mean": 3985.3649188957825,
+        "median": 3234.1239854364485,
+        "q25": 1994.2866576955348,
+        "q75": 5144.455452411625,
+        "valid_n": 135
+      },
+      "impaired_reference_standardized_mean": -0.16274265959287906,
+      "model_direction": "higher_values_toward_possible_impairment_like",
+      "overall_train_mean": 4554.078020840774,
+      "overall_train_std": 3130.2826230352466,
+      "task": "SFT",
+      "unit": "index"
+    },
+    {
+      "coefficient": -0.4706552858856115,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "pft_p_initial_word_count",
+      "healthy_reference": {
+        "mean": 20.2125,
+        "median": 19.0,
+        "q25": 15.0,
+        "q75": 24.0,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.3540905689049814,
+      "human_readable_label": "PFT P-initial Word Count",
+      "impaired_reference": {
+        "mean": 14.6125,
+        "median": 15.0,
+        "q25": 9.0,
+        "q75": 20.0,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.3540905689049817,
+      "model_direction": "higher_values_toward_healthy_like",
+      "overall_train_mean": 17.4125,
+      "overall_train_std": 7.90758140963468,
+      "task": "PFT",
+      "unit": "words"
+    },
+    {
+      "coefficient": -0.3968708283164799,
+      "feature_group": "ASR_LINGUISTIC",
+      "feature_key": "pft_p_initial_ratio",
+      "healthy_reference": {
+        "mean": 0.8166296624987914,
+        "median": 0.875,
+        "q25": 0.7385583524027459,
+        "q75": 0.9545454545454546,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.30345239336456986,
+      "human_readable_label": "PFT P-initial Word Ratio",
+      "impaired_reference": {
+        "mean": 0.6700533827337137,
+        "median": 0.7029411764705882,
+        "q25": 0.495,
+        "q75": 0.8903508771929824,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.30345239336456975,
+      "model_direction": "higher_values_toward_healthy_like",
+      "overall_train_mean": 0.7433415226162525,
+      "overall_train_std": 0.24151445658393575,
+      "task": "PFT",
+      "unit": "ratio"
+    },
+    {
+      "coefficient": -0.060923405481453016,
+      "feature_group": "ASR_RATE",
+      "feature_key": "sft_recording_word_rate_wpm",
+      "healthy_reference": {
+        "mean": 36.325562026920764,
+        "median": 32.98710475181064,
+        "q25": 26.86567164179105,
+        "q75": 43.80291959941073,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.00904138154564574,
+      "human_readable_label": "SFT Speech Rate",
+      "impaired_reference": {
+        "mean": 36.031367638719175,
+        "median": 33.0,
+        "q25": 22.988522954091817,
+        "q75": 41.791044776119406,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.00904138154564591,
+      "model_direction": "higher_values_toward_healthy_like",
+      "overall_train_mean": 36.17846483281998,
+      "overall_train_std": 16.269327133045657,
+      "task": "SFT",
+      "unit": "words per minute"
+    },
+    {
+      "coefficient": 0.08713923431186897,
+      "feature_group": "ASR_RATE",
+      "feature_key": "sft_articulation_rate_wpm",
+      "healthy_reference": {
+        "mean": 85.1840635317218,
+        "median": 83.98817513844197,
+        "q25": 67.20612134344529,
+        "q75": 99.00613081210638,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": -0.18841327596722218,
+      "human_readable_label": "SFT Articulation Rate",
+      "impaired_reference": {
+        "mean": 97.287442909165,
+        "median": 90.47163112311418,
+        "q25": 70.91428985023303,
+        "q75": 112.58842285775532,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": 0.18841327596722174,
+      "model_direction": "higher_values_toward_possible_impairment_like",
+      "overall_train_mean": 91.2357532204434,
+      "overall_train_std": 32.11923181981293,
+      "task": "SFT",
+      "unit": "words per minute"
+    },
+    {
+      "coefficient": 0.08447367581570284,
+      "feature_group": "ASR_RATE",
+      "feature_key": "pft_recording_word_rate_wpm",
+      "healthy_reference": {
+        "mean": 25.67318519083924,
+        "median": 23.59626399662987,
+        "q25": 17.94616151545364,
+        "q75": 31.06565939529363,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.036581456239247315,
+      "human_readable_label": "PFT Speech Rate",
+      "impaired_reference": {
+        "mean": 24.831451765268934,
+        "median": 21.83109721758573,
+        "q25": 16.0,
+        "q75": 30.921563652409024,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.036581456239247266,
+      "model_direction": "higher_values_toward_possible_impairment_like",
+      "overall_train_mean": 25.25231847805409,
+      "overall_train_std": 11.504919597312659,
+      "task": "PFT",
+      "unit": "words per minute"
+    },
+    {
+      "coefficient": -0.20554925340877594,
+      "feature_group": "ASR_RATE",
+      "feature_key": "pft_articulation_rate_wpm",
+      "healthy_reference": {
+        "mean": 89.87331963443407,
+        "median": 84.62640248269277,
+        "q25": 68.25394939037167,
+        "q75": 100.11441109778248,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": -0.11454929361012671,
+      "human_readable_label": "PFT Articulation Rate",
+      "impaired_reference": {
+        "mean": 99.80788997720822,
+        "median": 93.22045800435126,
+        "q25": 72.70070429884694,
+        "q75": 118.40243340203631,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": 0.11454929361012671,
+      "model_direction": "higher_values_toward_healthy_like",
+      "overall_train_mean": 94.84060480582116,
+      "overall_train_std": 43.36373464068169,
+      "task": "PFT",
+      "unit": "words per minute"
+    },
+    {
+      "coefficient": -0.08056345289855832,
+      "feature_group": "ASR_RATE",
+      "feature_key": "ctd_recording_word_rate_wpm",
+      "healthy_reference": {
+        "mean": 126.88794886044066,
+        "median": 122.73342368883769,
+        "q25": 109.32439036810942,
+        "q75": 143.01040743484896,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.2393481817610133,
+      "human_readable_label": "CTD Speech Rate",
+      "impaired_reference": {
+        "mean": 112.61481819961492,
+        "median": 111.41601702894582,
+        "q25": 92.50529248191003,
+        "q75": 128.9066878548793,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.23934818176101236,
+      "model_direction": "higher_values_toward_healthy_like",
+      "overall_train_mean": 119.75138353002777,
+      "overall_train_std": 29.81666824416779,
+      "task": "CTD",
+      "unit": "words per minute"
+    },
+    {
+      "coefficient": 0.05214589453275676,
+      "feature_group": "ASR_RATE",
+      "feature_key": "ctd_articulation_rate_wpm",
+      "healthy_reference": {
+        "mean": 176.72428727123366,
+        "median": 177.24745743355396,
+        "q25": 160.69370381480144,
+        "q75": 194.67479593469906,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.016172924755906624,
+      "human_readable_label": "CTD Articulation Rate",
+      "impaired_reference": {
+        "mean": 175.74871577235513,
+        "median": 174.7821374856233,
+        "q25": 157.7309185535528,
+        "q75": 193.80816490559715,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.016172924755906294,
+      "model_direction": "higher_values_toward_possible_impairment_like",
+      "overall_train_mean": 176.2365015217944,
+      "overall_train_std": 30.1606392660123,
+      "task": "CTD",
+      "unit": "words per minute"
+    },
+    {
+      "coefficient": -0.01735596341158251,
+      "feature_group": "CTD_ACOUSTIC",
+      "feature_key": "ctd_audio_duration_seconds",
+      "healthy_reference": {
+        "mean": 75.67588359375,
+        "median": 66.12,
+        "q25": 45.57,
+        "q75": 97.00500000000001,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.08010685004881268,
+      "human_readable_label": "CTD Recording Duration",
+      "impaired_reference": {
+        "mean": 69.393154296875,
+        "median": 57.69,
+        "q25": 40.724999999999994,
+        "q75": 85.40635937500001,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.08010685004881261,
+      "model_direction": "higher_values_toward_healthy_like",
+      "overall_train_mean": 72.5345189453125,
+      "overall_train_std": 39.21468197193283,
+      "task": "CTD",
+      "unit": "seconds"
+    },
+    {
+      "coefficient": 0.05414611314021322,
+      "feature_group": "CTD_ACOUSTIC",
+      "feature_key": "ctd_voiced_duration_seconds",
+      "healthy_reference": {
+        "mean": 54.267078125,
+        "median": 47.376000000000005,
+        "q25": 32.519999999999996,
+        "q75": 69.36,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.1444808247598325,
+      "human_readable_label": "CTD Voiced Duration",
+      "impaired_reference": {
+        "mean": 45.5753109375,
+        "median": 37.68,
+        "q25": 24.488,
+        "q75": 57.114000000000004,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.14448082475983265,
+      "model_direction": "higher_values_toward_possible_impairment_like",
+      "overall_train_mean": 49.92119453125,
+      "overall_train_std": 30.07931053116613,
+      "task": "CTD",
+      "unit": "seconds"
+    },
+    {
+      "coefficient": -0.16498797366957488,
+      "feature_group": "CTD_ACOUSTIC",
+      "feature_key": "ctd_silence_duration_seconds",
+      "healthy_reference": {
+        "mean": 21.40880546875,
+        "median": 17.946000000000005,
+        "q25": 11.19921875,
+        "q75": 29.69299999999999,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": -0.08605738356273056,
+      "human_readable_label": "CTD Silence Duration",
+      "impaired_reference": {
+        "mean": 23.817843359375,
+        "median": 20.212000000000003,
+        "q25": 13.76,
+        "q75": 31.376,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": 0.0860573835627306,
+      "model_direction": "higher_values_toward_healthy_like",
+      "overall_train_mean": 22.6133244140625,
+      "overall_train_std": 13.996694942909569,
+      "task": "CTD",
+      "unit": "seconds"
+    },
+    {
+      "coefficient": 0.179383029655805,
+      "feature_group": "CTD_ACOUSTIC",
+      "feature_key": "ctd_silence_ratio",
+      "healthy_reference": {
+        "mean": 0.2805972106034905,
+        "median": 0.27278584303383857,
+        "q25": 0.21624416889640055,
+        "q75": 0.34925970486711877,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": -0.3226149987415745,
+      "human_readable_label": "CTD Silence Ratio",
+      "impaired_reference": {
+        "mean": 0.3609953491954509,
+        "median": 0.3543581906930998,
+        "q25": 0.27261373280771384,
+        "q75": 0.4196973259006756,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": 0.32261499874157457,
+      "model_direction": "higher_values_toward_possible_impairment_like",
+      "overall_train_mean": 0.3207962798994707,
+      "overall_train_std": 0.12460384499414116,
+      "task": "CTD",
+      "unit": "ratio"
+    },
+    {
+      "coefficient": 0.05738718008611863,
+      "feature_group": "CTD_ACOUSTIC",
+      "feature_key": "ctd_pause_count",
+      "healthy_reference": {
+        "mean": 21.61875,
+        "median": 18.0,
+        "q25": 11.0,
+        "q75": 32.25,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.01491092757341129,
+      "human_readable_label": "CTD Pause Count",
+      "impaired_reference": {
+        "mean": 21.2125,
+        "median": 18.0,
+        "q25": 12.0,
+        "q75": 29.0,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.014910927573411087,
+      "model_direction": "higher_values_toward_possible_impairment_like",
+      "overall_train_mean": 21.415625,
+      "overall_train_std": 13.622559629503371,
+      "task": "CTD",
+      "unit": "pauses"
+    },
+    {
+      "coefficient": 0.07844215297952109,
+      "feature_group": "CTD_ACOUSTIC",
+      "feature_key": "ctd_pause_total_seconds",
+      "healthy_reference": {
+        "mean": 16.277000000000005,
+        "median": 12.512,
+        "q25": 6.848000000000001,
+        "q75": 23.51200000000001,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": -0.11430981824350635,
+      "human_readable_label": "CTD Total Pause Duration",
+      "impaired_reference": {
+        "mean": 19.083400000000005,
+        "median": 15.648,
+        "q25": 10.08,
+        "q75": 25.78400000000001,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": 0.11430981824350639,
+      "model_direction": "higher_values_toward_possible_impairment_like",
+      "overall_train_mean": 17.680200000000003,
+      "overall_train_std": 12.275410997600043,
+      "task": "CTD",
+      "unit": "seconds"
+    },
+    {
+      "coefficient": 0.20450957352469504,
+      "feature_group": "CTD_ACOUSTIC",
+      "feature_key": "ctd_pause_mean_seconds",
+      "healthy_reference": {
+        "mean": 0.7311208927085124,
+        "median": 0.6826666666666666,
+        "q25": 0.5313636363636364,
+        "q75": 0.8368198757763976,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": -0.26565072309486737,
+      "human_readable_label": "CTD Mean Pause Duration",
+      "impaired_reference": {
+        "mean": 0.9501572185600711,
+        "median": 0.8650666666666668,
+        "q25": 0.6758888888888889,
+        "q75": 1.0848,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": 0.26565072309486765,
+      "model_direction": "higher_values_toward_possible_impairment_like",
+      "overall_train_mean": 0.8406390556342916,
+      "overall_train_std": 0.4122637486165202,
+      "task": "CTD",
+      "unit": "seconds"
+    },
+    {
+      "coefficient": -0.0012499751244986336,
+      "feature_group": "CTD_ACOUSTIC",
+      "feature_key": "ctd_pause_max_seconds",
+      "healthy_reference": {
+        "mean": 2.3258,
+        "median": 1.568,
+        "q25": 1.112,
+        "q75": 2.688,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": -0.19504256141311055,
+      "human_readable_label": "CTD Maximum Pause Duration",
+      "impaired_reference": {
+        "mean": 3.2391999999999994,
+        "median": 2.416,
+        "q25": 1.728,
+        "q75": 3.944,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": 0.1950425614131104,
+      "model_direction": "higher_values_toward_healthy_like",
+      "overall_train_mean": 2.7825,
+      "overall_train_std": 2.341540208922324,
+      "task": "CTD",
+      "unit": "seconds"
+    },
+    {
+      "coefficient": -0.09372110544473497,
+      "feature_group": "CTD_ACOUSTIC",
+      "feature_key": "ctd_f0_mean_hz",
+      "healthy_reference": {
+        "mean": 160.56267212736506,
+        "median": 159.63963165419102,
+        "q25": 127.39071380042556,
+        "q75": 186.2341115249427,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.04791300440686797,
+      "human_readable_label": "CTD Mean Pitch",
+      "impaired_reference": {
+        "mean": 156.57645291138627,
+        "median": 154.20623856718777,
+        "q25": 120.77359041652488,
+        "q75": 185.7700983773418,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.04791300440686773,
+      "model_direction": "higher_values_toward_healthy_like",
+      "overall_train_mean": 158.56956251937567,
+      "overall_train_std": 41.59851031390789,
+      "task": "CTD",
+      "unit": "hertz"
+    },
+    {
+      "coefficient": -0.17042025019461843,
+      "feature_group": "CTD_ACOUSTIC",
+      "feature_key": "ctd_f0_std_hz",
+      "healthy_reference": {
+        "mean": 44.87410990008787,
+        "median": 39.64377622404824,
+        "q25": 28.557613451670402,
+        "q75": 56.48958172471703,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.05887190606342537,
+      "human_readable_label": "CTD Pitch Variability",
+      "impaired_reference": {
+        "mean": 42.418481762582594,
+        "median": 42.052878830130425,
+        "q25": 26.87258495395996,
+        "q75": 55.339941545161615,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.058871906063425884,
+      "model_direction": "higher_values_toward_healthy_like",
+      "overall_train_mean": 43.64629583133524,
+      "overall_train_std": 20.85568738728882,
+      "task": "CTD",
+      "unit": "hertz"
+    },
+    {
+      "coefficient": -0.005090078253997415,
+      "feature_group": "CTD_ACOUSTIC",
+      "feature_key": "ctd_f0_range_hz",
+      "healthy_reference": {
+        "mean": 313.00861364965294,
+        "median": 346.1645050204337,
+        "q25": 214.90164029373003,
+        "q75": 408.6195035068092,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.0696202150517097,
+      "human_readable_label": "CTD Pitch Range",
+      "impaired_reference": {
+        "mean": 297.3259460718358,
+        "median": 341.53024920522154,
+        "q25": 199.7736117221513,
+        "q75": 395.44168025831016,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.06962021505170987,
+      "model_direction": "higher_values_toward_healthy_like",
+      "overall_train_mean": 305.16727986074443,
+      "overall_train_std": 112.63012880791153,
+      "task": "CTD",
+      "unit": "hertz"
+    },
+    {
+      "coefficient": -0.26627023816914647,
+      "feature_group": "CTD_ACOUSTIC",
+      "feature_key": "ctd_rms_mean",
+      "healthy_reference": {
+        "mean": 0.04656792576517975,
+        "median": 0.04748819177742365,
+        "q25": 0.042605221505026374,
+        "q75": 0.051391796878638527,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": 0.3126834317858827,
+      "human_readable_label": "CTD Mean Voice Energy",
+      "impaired_reference": {
+        "mean": 0.04160411694349834,
+        "median": 0.0422181133381899,
+        "q25": 0.03696730289799645,
+        "q75": 0.04711120001109692,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": -0.31268343178588415,
+      "model_direction": "higher_values_toward_healthy_like",
+      "overall_train_mean": 0.04408602135433905,
+      "overall_train_std": 0.007937434985491142,
+      "task": "CTD",
+      "unit": "normalized RMS"
+    },
+    {
+      "coefficient": 0.14542886622011056,
+      "feature_group": "CTD_ACOUSTIC",
+      "feature_key": "ctd_rms_std",
+      "healthy_reference": {
+        "mean": 0.043490320132972236,
+        "median": 0.0439572034884015,
+        "q25": 0.04168912400432105,
+        "q75": 0.045256578842307646,
+        "valid_n": 160
+      },
+      "healthy_reference_standardized_mean": -0.1016234063364851,
+      "human_readable_label": "CTD Voice-Energy Variability",
+      "impaired_reference": {
+        "mean": 0.04411983912856507,
+        "median": 0.044246227951099046,
+        "q25": 0.042267752860456496,
+        "q75": 0.0459964821550049,
+        "valid_n": 160
+      },
+      "impaired_reference_standardized_mean": 0.10162340633648596,
+      "model_direction": "higher_values_toward_possible_impairment_like",
+      "overall_train_mean": 0.04380507963076865,
+      "overall_train_std": 0.0030973130024220604,
+      "task": "CTD",
+      "unit": "normalized RMS"
+    }
+  ],
+  "source": {
+    "feature_count": 51,
+    "healthy_participant_count": 160,
+    "impaired_participant_count": 160,
+    "official_test_participants_used": 0,
+    "participant_count": 320,
+    "raw_statistics": "NaN values are excluded per feature; no global raw-value imputation is applied.",
+    "representation": "ASR_RATE_PLUS_CTD",
+    "split": "TRAIN",
+    "standardized_statistics": "Frozen TRAIN-fitted median imputer followed by frozen StandardScaler; no scaler is fitted here."
+  }
+}
