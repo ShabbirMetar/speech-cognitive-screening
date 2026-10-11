@@ -108,6 +108,8 @@ Derived outputs are stored only under `artifacts/features/`: `acoustic_features.
 
 ## Current status
 
+**Current phase: DEMO / FINAL DOCUMENTATION.** ML research is closed, the predefined TEST partition is consumed, and the frozen FastAPI/React application is implemented. Remaining validation is operational demonstration on the actual faculty-demo laptop using newly recorded, non-PROCESS-2 speech.
+
 Completed research-pipeline stages are:
 
 - PROCESS-2 validation and metadata EDA.
@@ -127,6 +129,8 @@ The current explainability fit selected `C=0.1` with five-fold TRAIN CV F1 selec
 The final all-TRAIN serialized pipeline, strict 51-feature schema, deployment metadata, and SHA-256 manifest are available under `artifacts/models/`. The predefined PROCESS-2 TEST partition was evaluated after the ASR configuration, feature representation, preprocessing pipeline, classifier, regularization, and operating threshold had been frozen. It is now **consumed** and must not be used for further model development or re-evaluation. The production inference / FastAPI integration and React microphone assessment workflow are complete.
 
 The saved official record is `artifacts/results/official_test_evaluation/`; its metrics, bootstrap confidence intervals, confusion matrix, ROC curve, score-distribution plot, and descriptive diagnosis breakdown are documented in [docs/OFFICIAL_TEST_EVALUATION.md](docs/OFFICIAL_TEST_EVALUATION.md). During the first authorized evaluation, two evaluator processes inadvertently ran concurrently before atomic single-run protection was added. The finalized, internally consistent persisted bundle is the authoritative result by a procedural artifact-precedence rule—not because it was more favorable. The duplicate result is retained transparently as an execution anomaly in the evaluation note.
+
+For the final demonstration, use [docs/FACULTY_DEMO_CHECKLIST.md](docs/FACULTY_DEMO_CHECKLIST.md). The compact project and metric summary is [docs/FACULTY_QUICK_REFERENCE.md](docs/FACULTY_QUICK_REFERENCE.md).
 
 Run the reproducible, TRAIN-only explainability analysis with:
 

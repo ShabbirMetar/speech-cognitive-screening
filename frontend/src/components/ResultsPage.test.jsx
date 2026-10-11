@@ -34,6 +34,7 @@ describe('complete feature profile and score display', () => {
 
   it.each([
     [0, '0%'],
+    [31, '31%'],
     [53, '53%'],
     [100, '100%'],
   ])('fills the score bar to the returned score of %s', (score, expectedWidth) => {
