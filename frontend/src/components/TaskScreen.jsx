@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import RecordingPanel from './RecordingPanel.jsx'
 
@@ -21,26 +21,46 @@ const TASKS = {
     eyebrow: 'Task 3 of 3',
     title: 'Picture Description Task',
     prompt: 'Describe everything you see happening in the picture.',
-    detail: 'Keep the picture visible and speak in complete detail until you feel your description is finished.',
+    detail: 'Speak naturally until you feel your description is finished.',
     accent: 'Describe',
   },
 }
 
+const BUNDLED_STIMULUS_URL = '/assets/cookie-theft-picture.png'
+
 function Stimulus({ source }) {
+  const [currentSource, setCurrentSource] = useState(source)
   const [failed, setFailed] = useState(false)
-  if (!source || failed) {
+
+  useEffect(() => {
+    setCurrentSource(source)
+    setFailed(false)
+  }, [source])
+
+  function handleImageError() {
+    if (currentSource !== BUNDLED_STIMULUS_URL) {
+      setCurrentSource(BUNDLED_STIMULUS_URL)
+      return
+    }
+    setFailed(true)
+  }
+
+  if (failed) {
     return (
-      <div className="stimulus-placeholder" role="note">
-        <span className="stimulus-placeholder__icon" aria-hidden="true">▧</span>
-        <strong>Authorized picture stimulus is not bundled</strong>
-        <p>A facilitator must display the approved Cookie Theft picture separately, or configure an authorized local asset with <code>VITE_CTD_STIMULUS_URL</code>.</p>
-      </div>
+      <p className="inline-alert inline-alert--error" role="alert">
+        The picture stimulus could not be displayed. Please reload the page before recording this task.
+      </p>
     )
   }
+
   return (
     <figure className="stimulus-figure">
-      <img src={source} alt="Authorized Cookie Theft picture-description stimulus" onError={() => setFailed(true)} />
-      <figcaption>Picture Description stimulus</figcaption>
+      <img
+        src={currentSource}
+        alt="Picture used for the Cookie Theft description speech task"
+        onError={handleImageError}
+      />
+      <figcaption>Keep the picture visible while you describe everything you notice.</figcaption>
     </figure>
   )
 }
@@ -57,7 +77,9 @@ export default function TaskScreen({ task, recording, getMicrophoneStream, onRec
           <span className="task-prompt__accent" aria-hidden="true">{content.accent}</span>
           <div><p>{content.prompt}</p><small>{content.detail}</small></div>
         </div>
-        {task === 'ctd' && <Stimulus source={import.meta.env.VITE_CTD_STIMULUS_URL || ''} />}
+        {task === 'ctd' && (
+          <Stimulus source={import.meta.env.VITE_CTD_STIMULUS_URL || BUNDLED_STIMULUS_URL} />
+        )}
       </div>
       <div>
         <RecordingPanel taskName={task.toUpperCase()} recording={recording} getMicrophoneStream={getMicrophoneStream} onRecorded={onRecorded} onClear={onClear} />

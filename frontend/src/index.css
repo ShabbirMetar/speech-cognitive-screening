@@ -178,13 +178,9 @@ code { padding: 0.12rem 0.35rem; border-radius: 0.35rem; background: #e8efed; fo
 .inline-alert { margin: 1rem 0; padding: 0.9rem 1rem; border: 1px solid #deb974; border-radius: 12px; color: #6e4b10; background: var(--amber-soft); line-height: 1.5; }
 .inline-alert--error { border-color: #e6b5ba; color: #7c2630; background: var(--rose-soft); }
 .inline-alert .text-button { margin-left: 0.8rem; color: inherit; }
-.stimulus-placeholder { margin-top: 1.2rem; min-height: 190px; padding: 1.5rem; display: grid; place-items: center; align-content: center; text-align: center; border: 2px dashed #b8cbc8; border-radius: 18px; background: #edf3f1; }
-.stimulus-placeholder__icon { color: #668481; font-size: 2.5rem; }
-.stimulus-placeholder strong { margin: 0.5rem 0; color: var(--navy); }
-.stimulus-placeholder p { max-width: 550px; margin: 0; color: var(--ink-soft); font-size: 0.82rem; }
-.stimulus-figure { margin: 1.2rem 0 0; padding: 0.8rem; border: 1px solid var(--line); border-radius: 18px; background: white; }
-.stimulus-figure img { display: block; width: 100%; max-height: 440px; object-fit: contain; border-radius: 10px; }
-.stimulus-figure figcaption { padding-top: 0.5rem; color: var(--ink-soft); font-size: 0.78rem; text-align: center; }
+.stimulus-figure { width: 100%; max-width: 680px; margin: 1.2rem auto 0; padding: 1rem; border: 1px solid var(--line); border-radius: 18px; background: white; box-shadow: 0 12px 35px rgba(20,61,66,0.06); }
+.stimulus-figure img { display: block; width: min(100%, 650px); height: auto; margin: 0 auto; object-fit: contain; image-rendering: auto; border-radius: 10px; }
+.stimulus-figure figcaption { padding-top: 0.75rem; color: var(--ink-soft); font-size: 0.82rem; line-height: 1.5; text-align: center; }
 
 .review-list { display: grid; gap: 0.85rem; }
 .review-row { padding: 1rem 1.15rem; display: grid; grid-template-columns: 210px 1fr auto; gap: 1rem; align-items: center; border: 1px solid var(--line); border-radius: 16px; background: white; }

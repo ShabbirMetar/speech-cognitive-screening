@@ -7,7 +7,7 @@ Use this checklist on the actual laptop and browser intended for the faculty dem
 - [ ] Connect and test the intended microphone in the operating system and browser.
 - [ ] Use a quiet room and close CPU-heavy applications; faster-whisper runs locally on CPU.
 - [ ] Confirm the repository is on the intended committed revision and `git status` is clean.
-- [ ] Confirm an authorized Cookie Theft stimulus is available separately, or configure an authorized application-served asset through `VITE_CTD_STIMULUS_URL`. Do not download or substitute an unapproved image.
+- [ ] Open the CTD step once and confirm the bundled Picture Description stimulus loads clearly. Use `VITE_CTD_STIMULUS_URL` only when an authorized override is required.
 - [ ] Start the backend from the repository root:
 
   ```powershell
@@ -61,7 +61,7 @@ Use this checklist on the actual laptop and browser intended for the faculty dem
 - **Frontend cannot start or record:** use Swagger with newly created authorized/demo WAV files; never use consumed TEST recordings.
 - **Backend unavailable:** confirm the virtual environment, backend terminal, and `/api/health`; do not proceed until `screening_model_ready` is true.
 - **ASR is slow:** wait for the current request. Do not repeatedly submit or start parallel inference jobs.
-- **CTD asset unavailable:** display the authorized stimulus separately.
+- **CTD image fails to load:** reload the frontend and verify `frontend/public/assets/cookie-theft-picture.png` is present; remove an invalid `VITE_CTD_STIMULUS_URL` override so the bundled image is used.
 - **Reference visualization unavailable:** explain that it is optional visualization metadata. The core score, classification, transcripts, measurements, and local contributors should still work.
 - **Artifact integrity/model startup fails:** stop the demo inference path and use the saved project documentation. Do not regenerate or replace frozen model artifacts during the demonstration.
 - **No fake fallback:** never substitute a mocked prediction or present fixture data as real inference.

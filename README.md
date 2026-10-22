@@ -189,7 +189,7 @@ The default frontend URL is [http://localhost:5173](http://localhost:5173). `VIT
 
 Speech blobs and playback object URLs remain in browser memory only and are not written to local storage. The backend uses request-scoped temporary files and does not persist audio or transcripts by default. Microphone access requires a supported modern browser and a secure context; `localhost` is treated as secure by current browsers.
 
-No authorized Cookie Theft stimulus image was found in the repository, so the application does not download or substitute a random image. For a supervised demonstration, the facilitator can display the authorized stimulus separately. If an appropriately licensed local/hosted asset becomes available, set `VITE_CTD_STIMULUS_URL` to its application-served URL before starting Vite.
+The CTD Picture Description stimulus supplied for the project is bundled locally at `frontend/public/assets/cookie-theft-picture.png` and remains visible throughout the recording task. `VITE_CTD_STIMULUS_URL` may still be set to another authorized application-served image when an explicit override is required.
 
 ### Complete 51-feature profile
 
